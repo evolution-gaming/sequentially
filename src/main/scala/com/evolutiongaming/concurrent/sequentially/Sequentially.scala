@@ -27,7 +27,13 @@ object Sequentially {
   lazy val BufferSize: Int = Int.MaxValue
 
 
-  def apply[K](factory: ActorRefFactory): Sequentially[K] = apply(factory, None, Substreams)
+  def apply[K](factory: ActorRefFactory): Sequentially[K] = {
+    apply(factory, None, Substreams)
+  }
+
+  def apply[K](factory: ActorRefFactory, name: Option[String]): Sequentially[K] = {
+    apply(factory, name, Substreams)
+  }
 
   def apply[K](factory: ActorRefFactory, name: Option[String], substreams: Int): Sequentially[K] = {
 
