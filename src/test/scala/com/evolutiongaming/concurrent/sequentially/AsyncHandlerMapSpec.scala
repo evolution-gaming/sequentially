@@ -29,7 +29,7 @@ class AsyncHandlerMapSpec extends WordSpec with Matchers with ActorSpec {
         (MapDirective.update(0), before)
       }
       result.value shouldEqual Some(Success(None))
-      map.get(0) shouldEqual Some(0)
+      map.getNow(0) shouldEqual Some(0)
     }
 
     "update when state before is Some" in new Scope {
@@ -38,7 +38,7 @@ class AsyncHandlerMapSpec extends WordSpec with Matchers with ActorSpec {
         (MapDirective.remove, before)
       }
       result.value shouldEqual Some(Success(Some(0)))
-      map.get(0) shouldEqual None
+      map.getNow(0) shouldEqual None
     }
 
     "ignore" in new Scope {
@@ -46,14 +46,14 @@ class AsyncHandlerMapSpec extends WordSpec with Matchers with ActorSpec {
         (MapDirective.ignore, before)
       }
       result.value shouldEqual Some(Success(None))
-      map.get(0) shouldEqual None
+      map.getNow(0) shouldEqual None
     }
 
     "remove" in new Scope {
       map.remove(0).value shouldEqual Some(Success(None))
       map.put(0, 0)
       map.remove(0).value shouldEqual Some(Success(Some(0)))
-      map.get(0) shouldEqual None
+      map.getNow(0) shouldEqual None
     }
 
     "update async" in new Scope {
@@ -63,7 +63,7 @@ class AsyncHandlerMapSpec extends WordSpec with Matchers with ActorSpec {
         Future.successful(result)
       }.value shouldEqual Some(Success(None))
 
-      map.get(0) shouldEqual Some(0)
+      map.getNow(0) shouldEqual Some(0)
 
       val promise = Promise[MapDirective[K]]
       val result = map.updateAsync(0) { before =>
@@ -73,10 +73,10 @@ class AsyncHandlerMapSpec extends WordSpec with Matchers with ActorSpec {
       }
 
       result.value shouldEqual None
-      map.get(0) shouldEqual Some(0)
+      map.getNow(0) shouldEqual Some(0)
       promise.success(MapDirective.update(1))
       result.value shouldEqual Some(Success(Some(0)))
-      map.get(0) shouldEqual Some(1)
+      map.getNow(0) shouldEqual Some(1)
     }
 
     "add value" in new Scope {

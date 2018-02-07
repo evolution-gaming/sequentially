@@ -15,8 +15,8 @@ trait Sequentially[-K] {
 This example explains how we can ensure that there are no concurrent updates to `var state`
 
 ```scala
-type Key = Unit // fine in example
-val system = ActorSystem() // yes we have dependency on akka
+type Key = Unit // ok for example
+val system = ActorSystem() // yes, we have dependency on akka
 val sequentially = Sequentially[Key](system)
 
 var state: Int = 0

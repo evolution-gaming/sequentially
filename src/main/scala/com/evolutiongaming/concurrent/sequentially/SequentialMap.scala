@@ -29,7 +29,28 @@ trait SequentialMap[K, V] {
     }
   }
 
-  def get(key: K): Option[V] = values.get(key)
+  def getNow(key: K): Opt = values.get(key)
+
+  def get(key: K): Future[Opt] = {
+    update(key) { value =>
+      val directive = MapDirective.ignore
+      (directive, value)
+    }
+  }
+
+  def getOrUpdate(key: K)(value: => V): Future[V] = {
+    update(key) {
+      case Some(value) => (MapDirective.ignore, value)
+      case None        => (MapDirective.update(value), value)
+    }
+  }
+
+  def updateUnit(key: K)(f: Opt => Directive): Future[Unit] = {
+    update(key) { value =>
+      val directive = f(value)
+      (directive, ())
+    }
+  }
 
   override def toString: String = s"SequentialMap${ values mkString "," }"
 }

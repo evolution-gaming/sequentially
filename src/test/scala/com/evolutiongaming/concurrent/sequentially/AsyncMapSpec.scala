@@ -23,7 +23,7 @@ class AsyncMapSpec extends WordSpec with Matchers {
         (MapDirective.update(""), before)
       }
       result.value shouldEqual Some(Success(None))
-      map.get(0) shouldEqual Some("")
+      map.getNow(0) shouldEqual Some("")
     }
 
     "update when state before is Some" in new Scope {
@@ -32,7 +32,7 @@ class AsyncMapSpec extends WordSpec with Matchers {
         (MapDirective.remove, before)
       }
       result.value shouldEqual Some(Success(Some("")))
-      map.get(0) shouldEqual None
+      map.getNow(0) shouldEqual None
     }
 
     "ignore" in new Scope {
@@ -40,14 +40,14 @@ class AsyncMapSpec extends WordSpec with Matchers {
         (MapDirective.ignore, before)
       }
       result.value shouldEqual Some(Success(None))
-      map.get(0) shouldEqual None
+      map.getNow(0) shouldEqual None
     }
 
     "remove" in new Scope {
       map.remove(0).value shouldEqual Some(Success(None))
       map.put(0, "")
       map.remove(0).value shouldEqual Some(Success(Some("")))
-      map.get(0) shouldEqual None
+      map.getNow(0) shouldEqual None
     }
 
     "update async" in new Scope {
@@ -57,7 +57,7 @@ class AsyncMapSpec extends WordSpec with Matchers {
         Future.successful(result)
       }.value shouldEqual Some(Success(None))
 
-      map.get(0) shouldEqual Some("")
+      map.getNow(0) shouldEqual Some("")
 
       val promise = Promise[MapDirective[String]]
       val result = map.updateAsync(0) { before =>
@@ -67,10 +67,26 @@ class AsyncMapSpec extends WordSpec with Matchers {
       }
 
       result.value shouldEqual None
-      map.get(0) shouldEqual Some("")
+      map.getNow(0) shouldEqual Some("")
       promise.success(MapDirective.update(" "))
       result.value shouldEqual Some(Success(Some("")))
-      map.get(0) shouldEqual Some(" ")
+      map.getNow(0) shouldEqual Some(" ")
+    }
+
+    "getOrUpdate" in new Scope {
+      map.getOrUpdate(0)("a").value shouldEqual Some(Success("a"))
+      map.getOrUpdate(0)("b").value shouldEqual Some(Success("a"))
+    }
+
+    "updateUnit" in new Scope {
+      map.updateUnit(0) { _ => MapDirective.Update("a") }
+      map.getNow(0) shouldEqual Some("a")
+    }
+
+    "get" in new Scope {
+      map.get(0).value shouldEqual Some(Success(None))
+      map.put(0, "a")
+      map.get(0).value shouldEqual Some(Success(Some("a")))
     }
   }
 
