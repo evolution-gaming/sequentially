@@ -38,10 +38,12 @@ trait SequentialMap[K, V] {
     }
   }
 
-  def getOrUpdate(key: K)(value: => V): Future[V] = {
+  def getOrUpdate(key: K)(newValue: => V): Future[V] = {
     update(key) {
       case Some(value) => (MapDirective.ignore, value)
-      case None        => (MapDirective.update(value), value)
+      case None        =>
+        val value = newValue
+        (MapDirective.update(value), value)
     }
   }
 
