@@ -34,10 +34,6 @@ object SequentiallyHandler {
     overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
     (implicit materializer: Materializer): SequentiallyHandler[K] = {
 
-    case class Elem(substream: Int, apply: () => Future[() => Future[Unit]])
-
-    implicit val ec = CurrentThreadExecutionContext
-
     val queue = Source
       .queue[Elem](bufferSize, overflowStrategy)
       .groupBy(substreams, _.substream)
@@ -47,27 +43,29 @@ object SequentiallyHandler {
       .to(Sink.ignore)
       .run()
 
+    val ec = materializer.executionContext
+    implicit val ecNow = CurrentThreadExecutionContext
+
+    case class Elem(substream: Int, apply: () => Future[() => Future[Any]])
+
     new SequentiallyHandler[K] {
 
       def handler[KK <: K, T](key: KK)(task: => Future[() => Future[T]]): Future[T] = {
         val substream = Substream(key, substreams)
         val promise = Promise[T]
 
-        def safe[A](fallback: => A)(task: => Future[A]): Future[A] = {
-          val result = try task catch { case NonFatal(failure) => Future.failed(failure) }
-          result recover { case failure =>
-            promise.failure(failure)
-            fallback
+        val safeTask = () => {
+          def safeTask = task.map { task =>
+            () => {
+              val future = task()
+              promise completeWith future
+              future.recover[Any] { case _ => () }
+            }
           }
-        }
 
-        val safeTask = () => safe(() => Future.successful(())) {
-          task map { task =>
-            () =>
-              safe(()) {
-                task() map { result => promise.success(result); () }
-              }
-          }
+          val future = Future(safeTask)(ec) flatMap identity
+          future.failed.foreach { failure => promise failure failure }
+          future.recover { case _ => () => Future.successful(()) }
         }
 
         val elem = Elem(substream, safeTask)

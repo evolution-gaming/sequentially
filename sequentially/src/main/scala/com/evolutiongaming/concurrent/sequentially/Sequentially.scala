@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRefFactory, Props}
 import akka.routing.ConsistentHashingPool
 import akka.routing.ConsistentHashingRouter.ConsistentHashable
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{ActorMaterializer, OverflowStrategy}
+import akka.stream.{Materializer, OverflowStrategy}
 import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper._
 import com.evolutiongaming.concurrent.{AvailableProcessors, CurrentThreadExecutionContext}
 
@@ -61,24 +61,29 @@ object Sequentially {
     substreams: Int = Substreams,
     bufferSize: Int = BufferSize,
     overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
-    (implicit materializer: ActorMaterializer): Sequentially[K] = {
-
-    implicit val ec = CurrentThreadExecutionContext
+    (implicit materializer: Materializer): Sequentially[K] = {
 
     val queue = Source
       .queue[Elem](bufferSize, overflowStrategy)
       .groupBy(substreams, _.substream)
       .buffer(bufferSize, OverflowStrategy.backpressure)
-      .map { _.apply() }
+      .mapAsync(1) { _.apply() }
       .to(Sink.ignore)
-      .run()
+      .run()(materializer)
 
-    case class Elem(substream: Int, apply: () => Unit)
+    implicit val ecNow = CurrentThreadExecutionContext
+    val ec = materializer.executionContext
+
+    case class Elem(substream: Int, apply: () => Future[Any])
 
     new Sequentially[K] {
       def apply[KK <: K, T](key: KK)(task: => T): Future[T] = {
         val promise = Promise[T]
-        val safeTask: () => Unit = () => promise tryComplete Try(task)
+        val safeTask = () => {
+          val result = Future(task)(ec)
+          promise completeWith result
+          result.recover[Any] { case _ => () }
+        }
         val substream = Substream(key, substreams)
         val elem = Elem(substream, safeTask)
         for {

@@ -4,8 +4,8 @@ import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future, Promise}
 
 class SequentiallySpec extends WordSpec with ActorSpec with Matchers with ScalaFutures {
   import system.dispatcher
@@ -26,6 +26,19 @@ class SequentiallySpec extends WordSpec with ActorSpec with Matchers with ScalaF
       for {
         xs <- (Future sequence futures).futureValue
       } xs shouldEqual xs.sorted
+    }
+
+    "run in parallel for different keys" in new Scope {
+      val promise = Promise[Int]
+      val future1 = sequentially(0) { await(promise.future) }
+      val future2 = sequentially(0) { 2 }
+      val future3 = sequentially(1) { 3 }
+      future3.futureValue shouldEqual 3
+      future1.value shouldEqual None
+      future2.value shouldEqual None
+      promise.success(1)
+      future1.futureValue shouldEqual 1
+      future2.futureValue shouldEqual 2
     }
 
     "handle exceptions" in new Scope {
@@ -50,6 +63,18 @@ class SequentiallySpec extends WordSpec with ActorSpec with Matchers with ScalaF
       } xs shouldEqual xs.sorted
     }
 
+    "run in parallel for different keys" in new StreamScope {
+      val promise = Promise[Int]
+      val future1 = sequentially(0) { await(promise.future) }
+      val future2 = sequentially(0) { 2 }
+      val future3 = sequentially(1) { 3 }
+      future3.futureValue shouldEqual 3
+      future1.value shouldEqual None
+      future2.value shouldEqual None
+      promise.success(1)
+      future1.futureValue shouldEqual 1
+      future2.futureValue shouldEqual 2
+    }
 
     "handle exceptions" in new StreamScope {
       intercept[RuntimeException] {
@@ -66,5 +91,9 @@ class SequentiallySpec extends WordSpec with ActorSpec with Matchers with ScalaF
   private trait StreamScope extends ActorScope {
     implicit val materializer = ActorMaterializer()
     val sequentially: Sequentially[Int] = Sequentially[Int]()
+  }
+
+  def await[T](future: Future[T]) = {
+    Await.result(future, 5.seconds)
   }
 }
