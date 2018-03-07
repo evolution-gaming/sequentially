@@ -45,5 +45,4 @@ lazy val benchmark = (project
   enablePlugins(JmhPlugin)
   settings (name := "benchmark")
   settings commonSettings
-  settings(publishArtifact := false)
   dependsOn sequentially)
