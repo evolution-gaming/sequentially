@@ -28,7 +28,6 @@ lazy val root = (project
   in file(".")
   settings (name := "sequentially-root")
   settings commonSettings
-  settings(publishArtifact := false)
   aggregate(sequentially, benchmark))
 
 lazy val sequentially = (project
