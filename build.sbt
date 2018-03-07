@@ -28,7 +28,7 @@ lazy val root = (project
   in file(".")
   settings (name := "sequentially-root")
   settings commonSettings
-  settings(skip in publish := true)
+  settings(publishArtifact := false)
   aggregate(sequentially, benchmark))
 
 lazy val sequentially = (project
@@ -46,5 +46,5 @@ lazy val benchmark = (project
   enablePlugins(JmhPlugin)
   settings (name := "benchmark")
   settings commonSettings
-  settings(skip in publish := true)
+  settings(publishArtifact := false)
   dependsOn sequentially)
