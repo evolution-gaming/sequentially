@@ -72,9 +72,34 @@ class SequentiallyHandlerSpec extends WordSpec with ActorSpec with Matchers {
     }
 
     "return exceptions" in new Scope {
+      val promise1 = Promise[Unit]()
+      val result1 = sequentially.async(1)(promise1.future)
+      promise1.failure(TestException)
+
       the[TestException.type] thrownBy {
-        val result = sequentially.handler(0) { throw TestException }
-        Await.result(result, 100.millis)
+        await(result1)
+      }
+
+      val promise2 = Promise[Unit]()
+      val result2 = sequentially.async(1)(promise2.future)
+      promise2.success(())
+      await(result2)
+
+      val result3 = sequentially.async(1) { throw TestException }
+      the[TestException.type] thrownBy {
+        await(result3)
+      }
+
+      the[TestException.type] thrownBy {
+        await(sequentially.handler(1) { throw TestException })
+      }
+
+      the[TestException.type] thrownBy {
+        await(sequentially.handler(1) { Future.failed(TestException) })
+      }
+
+      the[TestException.type] thrownBy {
+        await(sequentially.handler(1) { Future.successful(() => Future.failed(TestException)) })
       }
     }
   }

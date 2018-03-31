@@ -55,17 +55,17 @@ object SequentiallyHandler {
         val promise = Promise[T]
 
         val safeTask = () => {
-          def safeTask = task.map { task =>
+          val safeTask = () => task.map { task =>
             () => {
-              val future = task()
+              val future = Future(task()).flatMap(identity)
               promise completeWith future
               future.recover[Any] { case _ => () }
             }
           }
 
-          val future = Future(safeTask)(ec) flatMap identity
+          val future = Future(safeTask())(ec) flatMap identity
           future.failed.foreach { failure => promise failure failure }
-          future.recover { case _ => () => Future.successful(()) }
+          future.recover { case _ => () => futureUnit }
         }
 
         val elem = Elem(substream, safeTask)
