@@ -41,11 +41,38 @@ class SequentiallySpec extends WordSpec with ActorSpec with Matchers with ScalaF
       future2.futureValue shouldEqual 2
     }
 
+    "support case class as key" in new ActorScope  {
+      case class Key(value: String)
+
+      val sequentially: Sequentially[Key] = Sequentially[Key](system)
+      var actual = List.empty[Int]
+      val expected = (0 to 10).toList
+
+      val futures = for {
+        x <- expected
+      } yield {
+        sequentially(Key("key")) {
+          actual = x :: actual
+        }
+      }
+
+      Future.sequence(futures).futureValue
+
+      actual.reverse shouldEqual expected
+    }
+
     "handle exceptions" in new Scope {
       intercept[RuntimeException] {
         sequentially(0) { throw new RuntimeException() }.futureValue
       }
       sequentially(0)("").futureValue shouldEqual ""
+    }
+
+    "handle any key" in new Scope {
+      val expected = (0 to 100).toSet
+      val futures = for { key <- expected} yield sequentially(key) { key }
+      val actual = Future.sequence(futures).futureValue
+      actual shouldEqual expected
     }
   }
 

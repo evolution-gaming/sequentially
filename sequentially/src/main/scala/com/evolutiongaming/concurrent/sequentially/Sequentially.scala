@@ -1,14 +1,13 @@
 package com.evolutiongaming.concurrent.sequentially
 
-import akka.actor.{Actor, ActorRefFactory, Props}
-import akka.routing.ConsistentHashingPool
-import akka.routing.ConsistentHashingRouter.ConsistentHashable
+import akka.actor.{Actor, ActorRef, ActorRefFactory, Props}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{Materializer, OverflowStrategy}
 import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper._
 import com.evolutiongaming.concurrent.{AvailableProcessors, CurrentThreadExecutionContext}
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future, Promise}
 import scala.util.Try
 
 /**
@@ -25,6 +24,7 @@ object Sequentially {
 
   lazy val Substreams: Int = AvailableProcessors() * 10
   lazy val BufferSize: Int = Int.MaxValue
+  lazy val Timeout: FiniteDuration = 5.seconds
 
 
   def apply[K](factory: ActorRefFactory): Sequentially[K] = {
@@ -36,21 +36,44 @@ object Sequentially {
   }
 
   def apply[K](factory: ActorRefFactory, name: Option[String], substreams: Int): Sequentially[K] = {
+    apply(factory, name, substreams, Timeout)
+  }
 
-    case class Task(consistentHashKey: K, task: () => Unit) extends ConsistentHashable
+  def apply[K](factory: ActorRefFactory, name: Option[String], substreams: Int, timeout: FiniteDuration): Sequentially[K] = {
 
-    def actor = new Actor {
-      def receive: Receive = { case Task(_, task) => task() }
+    case class Task(task: () => Unit)
+
+    def actor() = new Actor {
+      def receive: Receive = { case Task(task) => task() }
     }
 
-    val props = Props(actor) withRouter ConsistentHashingPool(substreams)
-    val ref = name map { name => factory.actorOf(props, name) } getOrElse factory.actorOf(props)
+    val promise = Promise[Map[Int, ActorRef]]
+
+    def supervisor() = new Actor {
+      val refs = for {
+        substream <- 0 until substreams
+      } yield {
+        val props = Props(actor())
+        val ref = context.actorOf(props, name = s"Sequentially-$substream")
+        (substream, ref)
+      }
+      promise.success(refs.toMap)
+
+      def receive = PartialFunction.empty
+    }
+
+    val props = Props(supervisor())
+    name map { name => factory.actorOf(props, name) } getOrElse factory.actorOf(props)
+
+    val refs = Await.result(promise.future, timeout)
 
     new Sequentially[K] {
       def apply[KK <: K, T](key: KK)(task: => T): Future[T] = {
         val promise = Promise[T]
-        val safeTask: () => Unit = () => promise tryComplete Try(task)
-        ref ! Task(key, safeTask)
+        val safeTask: () => Unit = () => promise complete Try(task)
+        val substream = Substream(key, substreams)
+        val ref = refs(substream)
+        ref.tell(Task(safeTask), ActorRef.noSender)
         promise.future
       }
     }
