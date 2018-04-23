@@ -50,10 +50,10 @@ object Sequentially {
     val promise = Promise[Map[Int, ActorRef]]
 
     def supervisor() = new Actor {
+      val props = Props(actor())
       val refs = for {
         substream <- 0 until substreams
       } yield {
-        val props = Props(actor())
         val ref = context.actorOf(props, name = s"Sequentially-$substream")
         (substream, ref)
       }
