@@ -2,6 +2,7 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.ActorMaterializer
 import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
+import com.evolutiongaming.concurrent.FutureHelper._
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.duration._
@@ -60,7 +61,7 @@ class AsyncHandlerMapSpec extends WordSpec with Matchers with ActorSpec {
       map.updateAsync(0) { before =>
         val directive = MapDirective.update(0)
         val result = (directive, before)
-        Future.successful(result)
+        result.future
       }.value shouldEqual Some(Success(None))
 
       map.getNow(0) shouldEqual Some(0)

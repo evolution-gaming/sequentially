@@ -2,12 +2,11 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.scaladsl.SourceQueue
 import akka.stream.{QueueOfferResult => Result}
+import com.evolutiongaming.concurrent.FutureHelper._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 object SourceQueueHelper {
-  private[sequentially] val futureUnit = Future.successful(())
-
 
   implicit class SourceQueueOps[T](val self: SourceQueue[T]) extends AnyVal {
 
@@ -15,7 +14,7 @@ object SourceQueueHelper {
       for {
         result <- self.offer(elem)
         result <- result match {
-          case Result.Enqueued         => futureUnit
+          case Result.Enqueued         => Future.unit
           case Result.Failure(failure) => Future.failed(new QueueException(errorMsg, Some(failure)))
           case failure                 => Future.failed(new QueueException(s"$errorMsg: $failure"))
         }

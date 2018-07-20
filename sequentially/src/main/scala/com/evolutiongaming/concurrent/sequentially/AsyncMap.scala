@@ -2,6 +2,7 @@ package com.evolutiongaming.concurrent.sequentially
 
 import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
 import com.evolutiongaming.concurrent.sequentially.TrieMapHelper._
+import com.evolutiongaming.concurrent.FutureHelper._
 
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.Future
@@ -35,7 +36,7 @@ object AsyncMap {
       }
 
       def update[T](key: K)(f: Opt => (Directive, T)): Future[T] = {
-        updateAsync(key) { value => Future.successful(f(value)) }
+        updateAsync(key) { value => f(value).future }
       }
     }
   }

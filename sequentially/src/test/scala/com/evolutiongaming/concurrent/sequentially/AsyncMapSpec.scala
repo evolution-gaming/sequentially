@@ -1,9 +1,10 @@
 package com.evolutiongaming.concurrent.sequentially
 
 import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
+import com.evolutiongaming.concurrent.FutureHelper._
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Promise
 import scala.util.Success
 
 class AsyncMapSpec extends WordSpec with Matchers {
@@ -54,7 +55,7 @@ class AsyncMapSpec extends WordSpec with Matchers {
       map.updateAsync(0) { before =>
         val directive = MapDirective.update("")
         val result = (directive, before)
-        Future.successful(result)
+        result.future
       }.value shouldEqual Some(Success(None))
 
       map.getNow(0) shouldEqual Some("")

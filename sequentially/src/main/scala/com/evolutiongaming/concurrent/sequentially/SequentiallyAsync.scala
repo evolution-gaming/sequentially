@@ -5,6 +5,7 @@ import akka.stream.{Materializer, OverflowStrategy}
 import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
 import com.evolutiongaming.concurrent.sequentially.Sequentially.{BufferSize, Substreams}
 import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper._
+import com.evolutiongaming.concurrent.FutureHelper._
 
 import scala.concurrent.{Future, Promise}
 import scala.util.control.NonFatal
@@ -18,7 +19,7 @@ trait SequentiallyAsync[-K] extends Sequentially[K] {
 
   def apply[KK <: K, T](key: KK)(task: => T): Future[T] = {
     async(key) {
-      Future.successful(task)
+      task.future
     }
   }
 }

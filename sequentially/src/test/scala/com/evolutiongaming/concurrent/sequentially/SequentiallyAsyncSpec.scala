@@ -2,6 +2,7 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.{ActorMaterializer, OverflowStrategy}
 import org.scalatest.{Matchers, WordSpec}
+import com.evolutiongaming.concurrent.FutureHelper._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future, Promise, TimeoutException}
@@ -67,7 +68,7 @@ class SequentiallyAsyncSpec extends WordSpec with ActorSpec with Matchers {
       promise1.success(())
       await(result1)
 
-      val result3 = sequentially.async(1)(Future.successful(()))
+      val result3 = sequentially.async(1)(Future.unit)
       await(result3)
     }
 

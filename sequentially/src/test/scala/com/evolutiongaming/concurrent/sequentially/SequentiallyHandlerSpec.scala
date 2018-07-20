@@ -2,6 +2,7 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.ActorMaterializer
 import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
+import com.evolutiongaming.concurrent.FutureHelper._
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.duration._
@@ -99,7 +100,7 @@ class SequentiallyHandlerSpec extends WordSpec with ActorSpec with Matchers {
       }
 
       the[TestException.type] thrownBy {
-        await(sequentially.handler(1) { Future.successful(() => Future.failed(TestException)) })
+        await(sequentially.handler(1) { (() => Future.failed(TestException)).future })
       }
     }
   }

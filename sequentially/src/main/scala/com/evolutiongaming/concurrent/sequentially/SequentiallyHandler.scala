@@ -5,6 +5,7 @@ import akka.stream.{Materializer, OverflowStrategy}
 import com.evolutiongaming.concurrent.sequentially.Sequentially.{BufferSize, Substreams}
 import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper._
 import com.evolutiongaming.concurrent.{AvailableProcessors, CurrentThreadExecutionContext}
+import com.evolutiongaming.concurrent.FutureHelper._
 
 import scala.concurrent.{Future, Promise}
 import scala.util.control.NonFatal
@@ -18,7 +19,7 @@ trait SequentiallyHandler[-K] extends SequentiallyAsync[K] {
 
   def async[KK <: K, T](key: K)(task: => Future[T]): Future[T] = {
     handler(key) {
-      Future.successful(() => task)
+      (() => task).future
     }
   }
 }
@@ -65,7 +66,7 @@ object SequentiallyHandler {
 
           val future = Future(safeTask())(ec) flatMap identity
           future.failed.foreach { failure => promise failure failure }
-          future.recover { case _ => () => futureUnit }
+          future.recover { case _ => () => Future.unit }
         }
 
         val elem = Elem(substream, safeTask)

@@ -54,7 +54,7 @@ object Sequentially {
       val refs = for {
         substream <- 0 until substreams
       } yield {
-        val ref = context.actorOf(props, name = s"Sequentially-$substream")
+        val ref = context.actorOf(props, name = substream.toString)
         (substream, ref)
       }
       promise.success(refs.toMap)
@@ -129,11 +129,5 @@ object Sequentially {
 
   class Comap[A, B](tmp: A => B, sequentially: Sequentially[B]) extends Sequentially[A] {
     def apply[AA <: A, T](key: AA)(f: => T): Future[T] = sequentially(tmp(key))(f)
-  }
-}
-
-object Substream {
-  def apply[T](key: T, substreams: Int): Int = {
-    math.abs(key.hashCode()) % substreams
   }
 }
