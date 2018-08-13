@@ -2,10 +2,10 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{Materializer, OverflowStrategy}
+import com.evolutiongaming.concurrent.FutureHelper._
 import com.evolutiongaming.concurrent.sequentially.Sequentially.{BufferSize, Substreams}
 import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper._
 import com.evolutiongaming.concurrent.{AvailableProcessors, CurrentThreadExecutionContext}
-import com.evolutiongaming.concurrent.FutureHelper._
 
 import scala.concurrent.{Future, Promise}
 import scala.util.control.NonFatal
@@ -35,17 +35,20 @@ object SequentiallyHandler {
     overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
     (implicit materializer: Materializer): SequentiallyHandler[K] = {
 
+    val pf: PartialFunction[Throwable, Unit] = { case _ => () }
+    val pff: PartialFunction[Throwable, () => Future[Unit]] = { case _ => () => Future.unit }
+
     val queue = Source
       .queue[Elem](bufferSize, overflowStrategy)
       .groupBy(substreams, _.substream)
       .buffer(bufferSize, OverflowStrategy.backpressure)
       .mapAsync(parallelism) { _.apply() }
       .mapAsync(1) { _.apply() }
+      .mergeSubstreams
       .to(Sink.ignore)
       .run()
 
-    val ec = materializer.executionContext
-    implicit val ecNow = CurrentThreadExecutionContext
+    implicit val ec = materializer.executionContext
 
     case class Elem(substream: Int, apply: () => Future[() => Future[Any]])
 
@@ -58,15 +61,15 @@ object SequentiallyHandler {
         val safeTask = () => {
           val safeTask = () => task.map { task =>
             () => {
-              val future = Future(task()).flatMap(identity)
-              promise completeWith future
-              future.recover[Any] { case _ => () }
+              val future = Future(task()).flatten
+              promise.completeWith(future)
+              future.recover[Any](pf)
             }
           }
 
-          val future = Future(safeTask())(ec) flatMap identity
-          future.failed.foreach { failure => promise failure failure }
-          future.recover { case _ => () => Future.unit }
+          val future = Future(safeTask()).flatten
+          future.failed.foreach { failure => promise.failure(failure) }
+          future.recover(pff)
         }
 
         val elem = Elem(substream, safeTask)

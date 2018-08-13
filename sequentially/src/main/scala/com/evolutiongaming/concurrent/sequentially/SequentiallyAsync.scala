@@ -2,10 +2,9 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{Materializer, OverflowStrategy}
-import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
+import com.evolutiongaming.concurrent.FutureHelper._
 import com.evolutiongaming.concurrent.sequentially.Sequentially.{BufferSize, Substreams}
 import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper._
-import com.evolutiongaming.concurrent.FutureHelper._
 
 import scala.concurrent.{Future, Promise}
 import scala.util.control.NonFatal
@@ -32,16 +31,18 @@ object SequentiallyAsync {
     overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
     (implicit materializer: Materializer): SequentiallyAsync[K] = {
 
+    val pf: PartialFunction[Throwable, Unit] = { case _ => () }
+
     val queue = Source
       .queue[Elem](bufferSize, overflowStrategy)
       .groupBy(substreams, _.substream)
       .buffer(bufferSize, OverflowStrategy.backpressure)
       .mapAsync(1) { _.apply() }
+      .mergeSubstreams
       .to(Sink.ignore)
       .run()
 
-    val ec = materializer.executionContext
-    implicit val ecNow = CurrentThreadExecutionContext
+    implicit val ec = materializer.executionContext
 
     case class Elem(substream: Int, apply: () => Future[Any])
 
@@ -50,9 +51,9 @@ object SequentiallyAsync {
       def async[KK <: K, T](key: K)(task: => Future[T]): Future[T] = {
         val promise = Promise[T]
         val safeTask = () => {
-          val result = Future(task)(ec) flatMap identity
-          promise completeWith result
-          result.recover[Any] { case _ => () }
+          val result = Future(task).flatten
+          promise.completeWith(result)
+          result.recover[Any](pf)
         }
         val substream = Substream(key, substreams)
         val elem = Elem(substream, safeTask)
