@@ -12,7 +12,7 @@ object MapDirective {
   def ignore[T]: MapDirective[T] = Ignore
 
   
-  case class Update[+T](newValue: T) extends MapDirective[T]
+  final case class Update[+T](newValue: T) extends MapDirective[T]
 
   case object Remove extends MapDirective[Nothing]
 
