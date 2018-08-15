@@ -1,12 +1,12 @@
 package com.evolutiongaming.concurrent.sequentially
 
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{Sink, Source, SourceQueue}
 import akka.stream.{Materializer, OverflowStrategy}
 import com.evolutiongaming.concurrent.FutureHelper._
 import com.evolutiongaming.concurrent.sequentially.Sequentially.{BufferSize, Substreams}
 import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper._
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 /**
@@ -31,8 +31,6 @@ object SequentiallyAsync {
     overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
     (implicit materializer: Materializer): SequentiallyAsync[K] = {
 
-    val pf: PartialFunction[Throwable, Unit] = { case _ => () }
-
     val queue = Source
       .queue[Elem](bufferSize, overflowStrategy)
       .groupBy(substreams, _.substream)
@@ -44,7 +42,13 @@ object SequentiallyAsync {
 
     implicit val ec = materializer.executionContext
 
-    case class Elem(substream: Int, apply: () => Future[Any])
+    apply(substreams, queue)
+  }
+
+  def apply[K](substreams: Int, queue: SourceQueue[Elem])
+    (implicit ec: ExecutionContext): SequentiallyAsync[K] = {
+
+    val pf: PartialFunction[Throwable, Unit] = { case _ => () }
 
     new SequentiallyAsync[K] {
 
@@ -74,4 +78,6 @@ object SequentiallyAsync {
       try task catch { case NonFatal(failure) => Future.failed(failure) }
     }
   }
+
+  final case class Elem(substream: Int, apply: () => Future[Any])
 }
