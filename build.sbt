@@ -38,8 +38,8 @@ lazy val sequentially = (project
   settings (libraryDependencies ++= Seq(
     "com.typesafe.akka" %% "akka-stream" % "2.5.14",
     "com.typesafe.akka" %% "akka-testkit" % "2.5.14" % Test,
-    "com.evolutiongaming" %% "executor-tools" % "1.0.0",
-    "com.evolutiongaming" %% "future-helper" % "1.0.2",
+    "com.evolutiongaming" %% "executor-tools" % "1.0.1",
+    "com.evolutiongaming" %% "future-helper" % "1.0.3",
     "org.scalatest" %% "scalatest" % "3.0.5" % Test)))
 
 lazy val benchmark = (project
