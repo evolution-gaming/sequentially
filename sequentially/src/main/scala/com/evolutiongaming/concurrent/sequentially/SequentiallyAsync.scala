@@ -31,6 +31,9 @@ object SequentiallyAsync {
     overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
     (implicit materializer: Materializer): SequentiallyAsync[K] = {
 
+    require(substreams > 0, s"substreams is $substreams")
+    require(bufferSize > 0, s"bufferSize is $bufferSize")
+
     val queue = Source
       .queue[Elem](bufferSize, overflowStrategy)
       .groupBy(substreams, _.substream)

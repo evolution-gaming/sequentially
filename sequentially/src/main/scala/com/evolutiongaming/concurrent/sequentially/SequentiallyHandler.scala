@@ -35,6 +35,10 @@ object SequentiallyHandler {
     overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
     (implicit materializer: Materializer): SequentiallyHandler[K] = {
 
+    require(substreams > 0, s"substreams is $substreams")
+    require(bufferSize > 0, s"bufferSize is $bufferSize")
+    require(parallelism > 0, s"parallelism is $parallelism")
+
     val pf: PartialFunction[Throwable, Unit] = { case _ => () }
     val pff: PartialFunction[Throwable, () => Future[Unit]] = { case _ => () => Future.unit }
 

@@ -22,7 +22,7 @@ trait Sequentially[-K] {
 
 object Sequentially {
 
-  lazy val Substreams: Int = AvailableProcessors() * 10
+  lazy val Substreams: Int = (AvailableProcessors() min 1) * 5
   lazy val BufferSize: Int = Int.MaxValue
   lazy val Timeout: FiniteDuration = 5.seconds
 
@@ -40,6 +40,8 @@ object Sequentially {
   }
 
   def apply[K](factory: ActorRefFactory, name: Option[String], substreams: Int, timeout: FiniteDuration): Sequentially[K] = {
+
+    require(substreams > 0, s"substreams is $substreams")
 
     case class Task(task: () => Unit)
 
