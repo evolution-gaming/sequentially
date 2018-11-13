@@ -22,9 +22,9 @@ trait Sequentially[-K] {
 
 object Sequentially {
 
-  lazy val Substreams: Int = (AvailableProcessors() min 1) * 5
-  lazy val BufferSize: Int = Int.MaxValue
-  lazy val Timeout: FiniteDuration = 5.seconds
+  val Substreams: Int = (AvailableProcessors() max 1) * 5
+  val BufferSize: Int = Int.MaxValue
+  val Timeout: FiniteDuration = 5.seconds
 
 
   def apply[K](factory: ActorRefFactory): Sequentially[K] = {
