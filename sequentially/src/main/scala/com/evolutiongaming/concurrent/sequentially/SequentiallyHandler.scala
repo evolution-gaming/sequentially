@@ -48,7 +48,6 @@ object SequentiallyHandler {
       .buffer(bufferSize, OverflowStrategy.backpressure)
       .mapAsync(parallelism) { _.apply() }
       .mapAsync(1) { _.apply() }
-      .mergeSubstreams
       .to(Sink.ignore)
       .run()
 

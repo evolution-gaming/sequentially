@@ -39,7 +39,6 @@ object SequentiallyAsync {
       .groupBy(substreams, _.substream)
       .buffer(bufferSize, OverflowStrategy.backpressure)
       .mapAsync(1) { _.apply() }
-      .mergeSubstreams
       .to(Sink.ignore)
       .run()
 
