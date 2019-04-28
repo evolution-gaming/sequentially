@@ -2,7 +2,6 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.{ActorMaterializer, OverflowStrategy}
 import org.scalatest.{Matchers, WordSpec}
-import com.evolutiongaming.concurrent.FutureHelper._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future, Promise, TimeoutException}

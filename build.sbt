@@ -5,8 +5,8 @@ lazy val commonSettings = Seq(
   organizationName := "Evolution Gaming",
   organizationHomepage := Some(url("http://evolutiongaming.com")),
   bintrayOrganization := Some("evolutiongaming"),
-  scalaVersion := crossScalaVersions.value.last,
-  crossScalaVersions := Seq("2.11.12", "2.12.7"),
+  scalaVersion := crossScalaVersions.value.head,
+  crossScalaVersions := Seq("2.12.8"),
   scalacOptions ++= Seq(
     "-encoding", "UTF-8",
     "-feature",
@@ -36,11 +36,11 @@ lazy val sequentially = (project
   settings (name := "sequentially")
   settings commonSettings
   settings (libraryDependencies ++= Seq(
-    "com.typesafe.akka" %% "akka-stream" % "2.5.18",
-    "com.typesafe.akka" %% "akka-testkit" % "2.5.18" % Test,
+    "com.typesafe.akka" %% "akka-stream" % "2.5.22",
+    "com.typesafe.akka" %% "akka-testkit" % "2.5.22" % Test,
     "com.evolutiongaming" %% "executor-tools" % "1.0.1",
-    "com.evolutiongaming" %% "future-helper" % "1.0.3",
-    "org.scalatest" %% "scalatest" % "3.0.5" % Test)))
+    "com.evolutiongaming" %% "future-helper" % "1.0.4",
+    "org.scalatest" %% "scalatest" % "3.0.7" % Test)))
 
 lazy val benchmark = (project
   in file("benchmark")

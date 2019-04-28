@@ -2,7 +2,6 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.scaladsl.SourceQueue
 import akka.stream.{QueueOfferResult => Result}
-import com.evolutiongaming.concurrent.FutureHelper._
 
 import scala.concurrent.{ExecutionContext, Future}
 
