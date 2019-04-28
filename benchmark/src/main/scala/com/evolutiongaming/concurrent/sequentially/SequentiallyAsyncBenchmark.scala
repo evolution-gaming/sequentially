@@ -29,5 +29,6 @@ class SequentiallyAsyncBenchmark extends Common {
   @TearDown(Level.Trial)
   def shutdown(): Unit = {
     Await.ready(system.terminate(), 15.seconds)
+    ()
   }
 }

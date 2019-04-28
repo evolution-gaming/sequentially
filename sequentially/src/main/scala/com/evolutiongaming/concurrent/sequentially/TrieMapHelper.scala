@@ -8,8 +8,8 @@ object TrieMapHelper {
 
     def apply(key: K, directive: MapDirective[V]): Unit = {
       directive match {
-        case MapDirective.Update(value) => self.put(key, value)
-        case MapDirective.Remove        => self.remove(key)
+        case MapDirective.Update(value) => self.put(key, value); ()
+        case MapDirective.Remove        => self.remove(key); ()
         case MapDirective.Ignore        =>
       }
     }
