@@ -1,6 +1,6 @@
 package com.evolutiongaming.concurrent.sequentially
 
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
 import com.evolutiongaming.concurrent.FutureHelper._
 import org.scalatest.{Matchers, WordSpec}
@@ -157,7 +157,7 @@ class AsyncHandlerMapSpec extends WordSpec with Matchers with ActorSpec {
     }
   }
 
-  private implicit val materializer = ActorMaterializer()(system)
+  private implicit val materializer = Materializer(system)
 
   private trait Scope {
     val key: K = 0

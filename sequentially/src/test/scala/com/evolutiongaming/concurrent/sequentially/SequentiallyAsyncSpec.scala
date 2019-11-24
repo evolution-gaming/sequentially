@@ -1,6 +1,6 @@
 package com.evolutiongaming.concurrent.sequentially
 
-import akka.stream.{ActorMaterializer, OverflowStrategy}
+import akka.stream.{Materializer, OverflowStrategy}
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.duration._
@@ -87,7 +87,7 @@ class SequentiallyAsyncSpec extends WordSpec with ActorSpec with Matchers {
     bufferSize: Int = Int.MaxValue,
     overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure) {
 
-    implicit val materializer = ActorMaterializer()
+    implicit val materializer = Materializer(system)
 
     val sequentially = SequentiallyAsync[Int](bufferSize = bufferSize, overflowStrategy = overflowStrategy)
 

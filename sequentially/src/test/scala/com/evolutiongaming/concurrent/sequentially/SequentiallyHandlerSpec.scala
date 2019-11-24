@@ -1,6 +1,6 @@
 package com.evolutiongaming.concurrent.sequentially
 
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
 import com.evolutiongaming.concurrent.FutureHelper._
 import org.scalatest.{Matchers, WordSpec}
@@ -105,7 +105,7 @@ class SequentiallyHandlerSpec extends WordSpec with ActorSpec with Matchers {
     }
   }
 
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer = Materializer(system)
   implicit val ec = CurrentThreadExecutionContext
 
   private trait Scope {

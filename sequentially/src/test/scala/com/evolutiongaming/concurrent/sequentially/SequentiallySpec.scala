@@ -1,6 +1,6 @@
 package com.evolutiongaming.concurrent.sequentially
 
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
 
@@ -116,7 +116,7 @@ class SequentiallySpec extends WordSpec with ActorSpec with Matchers with ScalaF
   }
 
   private trait StreamScope extends ActorScope {
-    implicit val materializer = ActorMaterializer()
+    implicit val materializer = Materializer(system)
     val sequentially: Sequentially[Int] = Sequentially[Int]()
   }
 

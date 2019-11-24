@@ -1,7 +1,7 @@
 package com.evolutiongaming.concurrent.sequentially
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import org.openjdk.jmh.annotations.{Benchmark, Level, Setup, TearDown}
 
 import scala.concurrent.Await
@@ -16,7 +16,7 @@ class SequentiallyAsyncBenchmark extends Common {
   def setup(): Unit = {
     system = ActorSystem("benchmark")
     sequentially = {
-      val materializer = ActorMaterializer()(system)
+      val materializer = Materializer(system)
       SequentiallyAsync()(materializer)
     }
   }
