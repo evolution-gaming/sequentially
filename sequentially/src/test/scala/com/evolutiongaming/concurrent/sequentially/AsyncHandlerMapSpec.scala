@@ -3,14 +3,15 @@ package com.evolutiongaming.concurrent.sequentially
 import akka.stream.Materializer
 import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
 import com.evolutiongaming.concurrent.FutureHelper._
-import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future, Promise}
 import scala.util.control.NoStackTrace
 import scala.util.{Failure, Success}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class AsyncHandlerMapSpec extends WordSpec with Matchers with ActorSpec {
+class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
 
   implicit val ec = CurrentThreadExecutionContext
 

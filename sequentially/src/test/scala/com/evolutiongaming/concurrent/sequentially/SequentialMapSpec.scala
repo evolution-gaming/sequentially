@@ -1,10 +1,11 @@
 package com.evolutiongaming.concurrent.sequentially
 
-import org.scalatest.{Matchers, WordSpec}
 
 import scala.util.Success
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class SequentialMapSpec extends WordSpec with Matchers {
+class SequentialMapSpec extends AnyWordSpec with Matchers {
 
   "SequentialMap" should {
 
