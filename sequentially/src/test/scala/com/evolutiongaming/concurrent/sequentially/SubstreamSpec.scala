@@ -1,8 +1,9 @@
 package com.evolutiongaming.concurrent.sequentially
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class SubstreamSpec extends FunSuite with Matchers {
+class SubstreamSpec extends AnyFunSuite with Matchers {
   for {
     (key, substream) <- List(
       (0, 0),

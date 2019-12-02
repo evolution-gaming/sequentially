@@ -2,12 +2,13 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.Materializer
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future, Promise}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class SequentiallySpec extends WordSpec with ActorSpec with Matchers with ScalaFutures {
+class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with ScalaFutures {
   import system.dispatcher
 
   implicit val defaultPatience = PatienceConfig(5.seconds, 100.millis)

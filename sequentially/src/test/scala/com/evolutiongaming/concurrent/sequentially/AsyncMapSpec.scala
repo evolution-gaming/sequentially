@@ -2,12 +2,13 @@ package com.evolutiongaming.concurrent.sequentially
 
 import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
 import com.evolutiongaming.concurrent.FutureHelper._
-import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.Promise
 import scala.util.Success
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class AsyncMapSpec extends WordSpec with Matchers {
+class AsyncMapSpec extends AnyWordSpec with Matchers {
 
   implicit val ec = CurrentThreadExecutionContext
 

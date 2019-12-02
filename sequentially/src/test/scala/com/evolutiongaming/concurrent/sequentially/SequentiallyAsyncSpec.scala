@@ -1,13 +1,14 @@
 package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.{Materializer, OverflowStrategy}
-import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future, Promise, TimeoutException}
 import scala.util.control.NoStackTrace
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class SequentiallyAsyncSpec extends WordSpec with ActorSpec with Matchers {
+class SequentiallyAsyncSpec extends AnyWordSpec with ActorSpec with Matchers {
 
   "SequentiallyAsync" should {
 
