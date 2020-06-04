@@ -9,6 +9,7 @@ import com.evolutiongaming.concurrent.{AvailableProcessors, CurrentThreadExecuti
 
 import scala.concurrent.{Future, Promise}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 
 /**
   * Runs tasks sequentially for the same key and in parallel - for different keys
@@ -40,7 +41,6 @@ object SequentiallyHandler {
     require(parallelism > 0, s"parallelism is $parallelism")
 
     val pf: PartialFunction[Throwable, Unit] = { case _ => () }
-    val pff: PartialFunction[Throwable, () => Future[Unit]] = { case _ => () => Future.unit }
 
     val queue = Source
       .queue[Elem](bufferSize, overflowStrategy)
@@ -70,9 +70,15 @@ object SequentiallyHandler {
             }
           }
 
-          val future = Future(safeTask()).flatten
-          future.failed.foreach { failure => promise.failure(failure) }
-          future.recover(pff)
+          Future
+            .apply { safeTask() }
+            .flatten
+            .transform {
+              case Failure(e) =>
+                promise.failure(e)
+                Success(() => Future.unit)
+              case a          => a
+            }
         }
 
         val elem = Elem(substream, safeTask)
