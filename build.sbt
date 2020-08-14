@@ -37,3 +37,12 @@ lazy val benchmark = (project
   settings (name := "benchmark")
   settings commonSettings
   dependsOn sequentially)
+
+lazy val `sequentially-metrics` = (project
+  in file("sequentially-metrics")
+  settings (name := "sequentially-metrics")
+  settings commonSettings
+  dependsOn sequentially
+  settings (libraryDependencies ++= Seq(
+    "com.evolutiongaming" %% "prometheus-tools" % "1.0.3"
+  )))
