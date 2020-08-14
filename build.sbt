@@ -18,7 +18,7 @@ lazy val root = (project
   settings (name := "sequentially-root")
   settings commonSettings
   settings (skip in publish := true)
-  aggregate(sequentially, benchmark))
+  aggregate(sequentially, benchmark, `sequentially-metrics`))
 
 lazy val sequentially = (project
   in file("sequentially")
