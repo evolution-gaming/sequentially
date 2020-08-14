@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 
 class SequentiallyAsyncBenchmark extends Common {
 
-  var system: ActorSystem = _
+  var system: ActorSystem                  = _
   var sequentially: SequentiallyAsync[Int] = _
 
   @Setup(Level.Trial)

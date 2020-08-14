@@ -15,4 +15,3 @@ trait ActorSpec extends BeforeAndAfterAll {
 
   abstract class ActorScope extends TestKit(system) with ImplicitSender with DefaultTimeout
 }
-

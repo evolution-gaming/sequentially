@@ -13,10 +13,10 @@ object SourceQueueHelper {
       for {
         result <- self.offer(elem)
         result <- result match {
-          case Result.Enqueued         => Future.unit
-          case Result.Failure(failure) => Future.failed(new QueueException(errorMsg, Some(failure)))
-          case failure                 => Future.failed(new QueueException(s"$errorMsg: $failure"))
-        }
+                   case Result.Enqueued         => Future.unit
+                   case Result.Failure(failure) => Future.failed(new QueueException(errorMsg, Some(failure)))
+                   case failure                 => Future.failed(new QueueException(s"$errorMsg: $failure"))
+                 }
       } yield result
     }
   }

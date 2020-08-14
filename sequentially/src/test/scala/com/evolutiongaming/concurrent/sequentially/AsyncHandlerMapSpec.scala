@@ -59,11 +59,13 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
     }
 
     "update async" in new Scope {
-      map.updateAsync(0) { before =>
-        val directive = MapDirective.update(0)
-        val result = (directive, before)
-        result.future
-      }.value shouldEqual Some(Success(None))
+      map
+        .updateAsync(0) { before =>
+          val directive = MapDirective.update(0)
+          val result    = (directive, before)
+          result.future
+        }
+        .value shouldEqual Some(Success(None))
 
       map.getNow(0) shouldEqual Some(0)
 
@@ -83,7 +85,7 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
 
     "add value" in new Scope {
       val result = map.update(key) { value =>
-        val newValue = (value getOrElse 0) + 1
+        val newValue  = (value getOrElse 0) + 1
         val directive = MapDirective.update(newValue)
         (directive, newValue)
       }
@@ -95,7 +97,7 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
 
     "remove value" in new Scope {
       val result = map.update(key) { value =>
-        val newValue = (value getOrElse 0) + 1
+        val newValue  = (value getOrElse 0) + 1
         val directive = MapDirective.update(newValue)
         (directive, newValue)
       }
@@ -108,7 +110,7 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
 
     "update value" in new Scope {
       val result = map.update(key) { value =>
-        val newValue = (value getOrElse 0) + 1
+        val newValue  = (value getOrElse 0) + 1
         val directive = MapDirective.update(newValue)
         (directive, newValue)
       }
@@ -119,13 +121,13 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
     }
 
     "preserve order" in new Scope {
-      val p0 = Promise[Unit]()
-      val p1 = Promise[Unit]()
+      val p0      = Promise[Unit]()
+      val p1      = Promise[Unit]()
       val result0 = update(1, p0, p1)
       result0.value shouldEqual None
 
-      val p2 = Promise[Unit]()
-      val p3 = Promise[Unit]()
+      val p2      = Promise[Unit]()
+      val p3      = Promise[Unit]()
       val result1 = update(2, p2, p3)
       result1.value shouldEqual None
 
@@ -151,10 +153,26 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
     }
 
     "handle exceptions" in new Scope {
-      map.update(key) { _ => throw TestException }.value shouldEqual Some(Failure(TestException))
-      map.updateAsync(key) { _ => Future.failed(TestException) }.value shouldEqual Some(Failure(TestException))
-      map.updateHandler(key) { _ => throw TestException }.value shouldEqual Some(Failure(TestException))
-      map.updateHandler(key) { _ => Future.failed(TestException) }.value shouldEqual Some(Failure(TestException))
+      map
+        .update(key) { _ =>
+          throw TestException
+        }
+        .value shouldEqual Some(Failure(TestException))
+      map
+        .updateAsync(key) { _ =>
+          Future.failed(TestException)
+        }
+        .value shouldEqual Some(Failure(TestException))
+      map
+        .updateHandler(key) { _ =>
+          throw TestException
+        }
+        .value shouldEqual Some(Failure(TestException))
+      map
+        .updateHandler(key) { _ =>
+          Future.failed(TestException)
+        }
+        .value shouldEqual Some(Failure(TestException))
     }
   }
 
@@ -162,16 +180,15 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
 
   private trait Scope {
     val key: K = 0
-    val map = AsyncHandlerMap[K, V](sequentially)
+    val map    = AsyncHandlerMap[K, V](sequentially)
 
     def update(idx: Int, p0: Promise[Unit], p1: Promise[Unit]): Future[Int] = {
       map.updateHandler[Int](key) { _ =>
-        p0.future map { _ =>
-          (_: Option[V]) =>
-            p1.future map { _ =>
-              val directive = MapDirective.update(idx)
-              (directive, idx)
-            }
+        p0.future map { _ => (_: Option[V]) =>
+          p1.future map { _ =>
+            val directive = MapDirective.update(idx)
+            (directive, idx)
+          }
         }
       }
     }
@@ -181,7 +198,7 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
 
   implicit class FutureOps[T](self: Future[T]) {
     def get: Option[T] = self.value map { _.get }
-    def await: T = Await.result(self, 3.seconds)
+    def await: T       = Await.result(self, 3.seconds)
   }
 
   private object TestException extends RuntimeException with NoStackTrace

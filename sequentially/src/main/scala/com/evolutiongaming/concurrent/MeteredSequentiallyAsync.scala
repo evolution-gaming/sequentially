@@ -6,16 +6,12 @@ import scala.concurrent.Future
 
 object MeteredSequentiallyAsync {
 
-  def apply[K](sequentially: SequentiallyAsync[K],
-               name: String,
-               sequentiallyMetrics: SequentiallyMetrics.Factory,
-  ): SequentiallyAsync[K] = {
+  def apply[K](sequentially: SequentiallyAsync[K], name: String, sequentiallyMetrics: SequentiallyMetrics.Factory): SequentiallyAsync[K] = {
     apply(sequentially, sequentiallyMetrics(name))
   }
 
-  def apply[K](sequentially: SequentiallyAsync[K],
-               metrics: SequentiallyMetrics,
-  ): SequentiallyAsync[K] = new SequentiallyAsync[K] {
+  def apply[K](sequentially: SequentiallyAsync[K], metrics: SequentiallyMetrics): SequentiallyAsync[K] = new SequentiallyAsync[K] {
+
     def async[KK <: K, T](key: K)(task: => Future[T]): Future[T] = {
       val start = System.nanoTime()
 

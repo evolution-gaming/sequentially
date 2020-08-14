@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 
 class SequentiallyHandlerBenchmark extends Common {
 
-  var system: ActorSystem = _
+  var system: ActorSystem                    = _
   var sequentially: SequentiallyHandler[Int] = _
 
   @Setup(Level.Trial)
@@ -32,4 +32,3 @@ class SequentiallyHandlerBenchmark extends Common {
     ()
   }
 }
-

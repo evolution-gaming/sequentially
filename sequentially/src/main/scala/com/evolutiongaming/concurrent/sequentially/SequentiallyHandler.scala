@@ -33,8 +33,8 @@ object SequentiallyHandler {
     substreams: Int = Substreams,
     parallelism: Int = Parallelism,
     bufferSize: Int = BufferSize,
-    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
-    (implicit materializer: Materializer): SequentiallyHandler[K] = {
+    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure
+  )(implicit materializer: Materializer): SequentiallyHandler[K] = {
 
     require(substreams > 0, s"substreams is $substreams")
     require(bufferSize > 0, s"bufferSize is $bufferSize")
@@ -59,16 +59,17 @@ object SequentiallyHandler {
 
       def handler[KK <: K, T](key: KK)(task: => Future[() => Future[T]]): Future[T] = {
         val substream = Substream(key, substreams)
-        val promise = Promise[T]()
+        val promise   = Promise[T]()
 
         val safeTask = () => {
-          val safeTask = () => task.map { task =>
-            () => {
-              val future = Future(task()).flatten
-              promise.completeWith(future)
-              future.recover[Any](pf)
+          val safeTask = () =>
+            task.map { task => () =>
+              {
+                val future = Future(task()).flatten
+                promise.completeWith(future)
+                future.recover[Any](pf)
+              }
             }
-          }
 
           Future
             .apply { safeTask() }
@@ -77,23 +78,21 @@ object SequentiallyHandler {
               case Failure(e) =>
                 promise.failure(e)
                 Success(() => Future.unit)
-              case a          => a
+              case a => a
             }
         }
 
         val elem = Elem(substream, safeTask)
 
         for {
-          _ <- queue.offerOrError(elem, s"$key failed to enqueue task")
+          _      <- queue.offerOrError(elem, s"$key failed to enqueue task")
           result <- promise.future
         } yield result
       }
     }
   }
 
-
   def now[T]: SequentiallyHandler[T] = Now
-
 
   private object Now extends SequentiallyHandler[Any] {
 

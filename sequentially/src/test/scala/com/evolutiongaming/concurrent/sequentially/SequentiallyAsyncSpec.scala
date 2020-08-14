@@ -84,9 +84,7 @@ class SequentiallyAsyncSpec extends AnyWordSpec with ActorSpec with Matchers {
     }
   }
 
-  private class Scope(
-    bufferSize: Int = Int.MaxValue,
-    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure) {
+  private class Scope(bufferSize: Int = Int.MaxValue, overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure) {
 
     implicit val materializer = Materializer(system)
 
@@ -108,5 +106,3 @@ class SequentiallyAsyncSpec extends AnyWordSpec with ActorSpec with Matchers {
     case object TestException extends RuntimeException with NoStackTrace
   }
 }
-
-

@@ -22,10 +22,9 @@ trait Sequentially[-K] {
 
 object Sequentially {
 
-  val Substreams: Int = (AvailableProcessors() max 1) * 5
-  val BufferSize: Int = Int.MaxValue
+  val Substreams: Int         = (AvailableProcessors() max 1) * 5
+  val BufferSize: Int         = Int.MaxValue
   val Timeout: FiniteDuration = 5.seconds
-
 
   def apply[K](factory: ActorRefFactory): Sequentially[K] = {
     apply(factory, None, Substreams)
@@ -65,28 +64,27 @@ object Sequentially {
     }
 
     val props = Props(supervisor())
-    name map { name => factory.actorOf(props, name) } getOrElse factory.actorOf(props)
+    name map { name =>
+      factory.actorOf(props, name)
+    } getOrElse factory.actorOf(props)
 
     val refs = Await.result(promise.future, timeout)
 
     new Sequentially[K] {
       def apply[KK <: K, T](key: KK)(task: => T): Future[T] = {
-        val promise = Promise[T]()
+        val promise              = Promise[T]()
         val safeTask: () => Unit = () => promise complete Try(task)
-        val substream = Substream(key, substreams)
-        val ref = refs(substream)
+        val substream            = Substream(key, substreams)
+        val ref                  = refs(substream)
         ref.tell(Task(safeTask), ActorRef.noSender)
         promise.future
       }
     }
   }
 
-
-  def apply[K](
-    substreams: Int = Substreams,
-    bufferSize: Int = BufferSize,
-    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
-    (implicit materializer: Materializer): Sequentially[K] = {
+  def apply[K](substreams: Int = Substreams, bufferSize: Int = BufferSize, overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)(
+    implicit materializer: Materializer
+  ): Sequentially[K] = {
 
     val queue = Source
       .queue[Elem](bufferSize, overflowStrategy)
@@ -97,7 +95,7 @@ object Sequentially {
       .run()(materializer)
 
     implicit val ecNow = CurrentThreadExecutionContext
-    val ec = materializer.executionContext
+    val ec             = materializer.executionContext
 
     case class Elem(substream: Int, apply: () => Future[Any])
 
@@ -110,24 +108,23 @@ object Sequentially {
           result.recover[Any] { case _ => () }
         }
         val substream = Substream(key, substreams)
-        val elem = Elem(substream, safeTask)
+        val elem      = Elem(substream, safeTask)
         for {
-          _ <- queue.offerOrError(elem, s"$key failed to enqueue task")
+          _      <- queue.offerOrError(elem, s"$key failed to enqueue task")
           result <- promise.future
         } yield result
       }
     }
   }
 
-
   def now[K]: Sequentially[K] = Now
 
   private object Now extends Sequentially[Any] {
+
     def apply[KK <: Any, T](key: KK)(task: => T): Future[T] = {
       Future fromTry Try(task)
     }
   }
-
 
   class Comap[A, B](tmp: A => B, sequentially: Sequentially[B]) extends Sequentially[A] {
     def apply[AA <: A, T](key: AA)(f: => T): Future[T] = sequentially(tmp(key))(f)

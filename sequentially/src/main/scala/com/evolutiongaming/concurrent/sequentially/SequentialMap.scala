@@ -41,7 +41,7 @@ trait SequentialMap[K, V] {
   def getOrUpdate(key: K)(newValue: => V): Future[V] = {
     update(key) {
       case Some(value) => (MapDirective.ignore, value)
-      case None        =>
+      case None =>
         val value = newValue
         (MapDirective.update(value), value)
     }
@@ -54,14 +54,12 @@ trait SequentialMap[K, V] {
     }
   }
 
-  override def toString: String = s"SequentialMap${ values mkString "," }"
+  override def toString: String = s"SequentialMap${values mkString ","}"
 }
 
 object SequentialMap {
 
-  def apply[K, V](
-    sequentially: Sequentially[K],
-    map: TrieMap[K, V] = TrieMap.empty[K, V]): SequentialMap[K, V] = {
+  def apply[K, V](sequentially: Sequentially[K], map: TrieMap[K, V] = TrieMap.empty[K, V]): SequentialMap[K, V] = {
 
     new SequentialMap[K, V] {
 
@@ -70,7 +68,7 @@ object SequentialMap {
       def update[T](key: K)(f: Opt => (Directive, T)): Future[T] = {
 
         sequentially(key) {
-          val value = map.get(key)
+          val value               = map.get(key)
           val (directive, result) = f(value)
           map.apply(key, directive)
           result

@@ -21,11 +21,15 @@ class SequentiallyHandlerSpec extends AnyWordSpec with ActorSpec with Matchers {
       val p4 = Promise[Unit]()
 
       val result1 = sequentially.handler(0) {
-        p1.future map { _ => () => p2.future }
+        p1.future map { _ => () =>
+          p2.future
+        }
       }
 
       val result2 = sequentially.handler(0) {
-        p3.future map { _ => () => p4.future }
+        p3.future map { _ => () =>
+          p4.future
+        }
       }
 
       expectTimeout(result1)
@@ -51,11 +55,15 @@ class SequentiallyHandlerSpec extends AnyWordSpec with ActorSpec with Matchers {
       val p4 = Promise[Unit]()
 
       val result1 = sequentially.handler(0) {
-        p1.future map { _ => () => p2.future }
+        p1.future map { _ => () =>
+          p2.future
+        }
       }
 
       val result2 = sequentially.handler(1) {
-        p3.future map { _ => () => p4.future }
+        p3.future map { _ => () =>
+          p4.future
+        }
       }
 
       expectTimeout(result1)
@@ -75,7 +83,7 @@ class SequentiallyHandlerSpec extends AnyWordSpec with ActorSpec with Matchers {
 
     "return exceptions" in new Scope {
       val promise1 = Promise[Unit]()
-      val result1 = sequentially.async(1)(promise1.future)
+      val result1  = sequentially.async(1)(promise1.future)
       promise1.failure(TestException)
 
       the[TestException.type] thrownBy {
@@ -83,7 +91,7 @@ class SequentiallyHandlerSpec extends AnyWordSpec with ActorSpec with Matchers {
       }
 
       val promise2 = Promise[Unit]()
-      val result2 = sequentially.async(1)(promise2.future)
+      val result2  = sequentially.async(1)(promise2.future)
       promise2.success(())
       await(result2)
 
@@ -107,7 +115,7 @@ class SequentiallyHandlerSpec extends AnyWordSpec with ActorSpec with Matchers {
   }
 
   implicit val materializer = Materializer(system)
-  implicit val ec = CurrentThreadExecutionContext
+  implicit val ec           = CurrentThreadExecutionContext
 
   private trait Scope {
 

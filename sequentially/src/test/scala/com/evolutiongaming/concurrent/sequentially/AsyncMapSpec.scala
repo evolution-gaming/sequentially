@@ -53,11 +53,13 @@ class AsyncMapSpec extends AnyWordSpec with Matchers {
     }
 
     "update async" in new Scope {
-      map.updateAsync(0) { before =>
-        val directive = MapDirective.update("")
-        val result = (directive, before)
-        result.future
-      }.value shouldEqual Some(Success(None))
+      map
+        .updateAsync(0) { before =>
+          val directive = MapDirective.update("")
+          val result    = (directive, before)
+          result.future
+        }
+        .value shouldEqual Some(Success(None))
 
       map.getNow(0) shouldEqual Some("")
 
@@ -81,7 +83,9 @@ class AsyncMapSpec extends AnyWordSpec with Matchers {
     }
 
     "updateUnit" in new Scope {
-      map.updateUnit(0) { _ => MapDirective.Update("a") }
+      map.updateUnit(0) { _ =>
+        MapDirective.Update("a")
+      }
       map.getNow(0) shouldEqual Some("a")
     }
 
@@ -96,4 +100,3 @@ class AsyncMapSpec extends AnyWordSpec with Matchers {
     val map = AsyncMap[Int, String](SequentiallyAsync.now)
   }
 }
-

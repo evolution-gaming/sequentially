@@ -19,8 +19,8 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
 
     "run sequentially for key" in new Scope {
 
-      val futures = for {_ <- 0 to n} yield Future {
-        val futures = for {key <- 0 to n} yield sequentially(key) { Thread.sleep(1); key }
+      val futures = for { _ <- 0 to n } yield Future {
+        val futures = for { key <- 0 to n } yield sequentially(key) { Thread.sleep(1); key }
         Future sequence futures
       } flatMap identity
 
@@ -42,12 +42,12 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
       future2.futureValue shouldEqual 2
     }
 
-    "support case class as key" in new ActorScope  {
+    "support case class as key" in new ActorScope {
       case class Key(value: String)
 
       val sequentially: Sequentially[Key] = Sequentially[Key](system)
-      var actual = List.empty[Int]
-      val expected = (0 to 10).toList
+      var actual                          = List.empty[Int]
+      val expected                        = (0 to 10).toList
 
       val futures = for {
         x <- expected
@@ -71,8 +71,8 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
 
     "handle any key" in new Scope {
       val expected = (0 to 100).toSet
-      val futures = for { key <- expected} yield sequentially(key) { key }
-      val actual = Future.sequence(futures).futureValue
+      val futures  = for { key <- expected } yield sequentially(key) { key }
+      val actual   = Future.sequence(futures).futureValue
       actual shouldEqual expected
     }
   }
@@ -81,8 +81,8 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
 
     "run sequentially for key" in new StreamScope {
 
-      val futures = for {_ <- 0 to n} yield Future {
-        val futures = for {key <- 0 to n} yield sequentially(key) { Thread.sleep(1); key }
+      val futures = for { _ <- 0 to n } yield Future {
+        val futures = for { key <- 0 to n } yield sequentially(key) { Thread.sleep(1); key }
         Future sequence futures
       } flatMap identity
 
@@ -117,7 +117,7 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
   }
 
   private trait StreamScope extends ActorScope {
-    implicit val materializer = Materializer(system)
+    implicit val materializer           = Materializer(system)
     val sequentially: Sequentially[Int] = Sequentially[Int]()
   }
 

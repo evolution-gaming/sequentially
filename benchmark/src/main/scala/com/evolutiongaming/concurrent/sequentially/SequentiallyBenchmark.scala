@@ -6,10 +6,9 @@ import org.openjdk.jmh.annotations._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-
 class SequentiallyBenchmark extends Common {
 
-  var system: ActorSystem = _
+  var system: ActorSystem             = _
   var sequentially: Sequentially[Int] = _
 
   @Setup(Level.Trial)

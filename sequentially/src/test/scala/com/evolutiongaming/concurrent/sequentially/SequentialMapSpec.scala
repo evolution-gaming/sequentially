@@ -1,6 +1,5 @@
 package com.evolutiongaming.concurrent.sequentially
 
-
 import scala.util.Success
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -53,7 +52,9 @@ class SequentialMapSpec extends AnyWordSpec with Matchers {
     }
 
     "updateUnit" in new Scope {
-      map.updateUnit(0) { _ => MapDirective.Update("a") }
+      map.updateUnit(0) { _ =>
+        MapDirective.Update("a")
+      }
       map.getNow(0) shouldEqual Some("a")
     }
 

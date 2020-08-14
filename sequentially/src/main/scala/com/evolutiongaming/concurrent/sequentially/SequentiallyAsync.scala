@@ -25,11 +25,9 @@ trait SequentiallyAsync[-K] extends Sequentially[K] {
 
 object SequentiallyAsync {
 
-  def apply[K](
-    substreams: Int = Substreams,
-    bufferSize: Int = BufferSize,
-    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
-    (implicit materializer: Materializer): SequentiallyAsync[K] = {
+  def apply[K](substreams: Int = Substreams, bufferSize: Int = BufferSize, overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)(
+    implicit materializer: Materializer
+  ): SequentiallyAsync[K] = {
 
     require(substreams > 0, s"substreams is $substreams")
     require(bufferSize > 0, s"bufferSize is $bufferSize")
@@ -47,8 +45,7 @@ object SequentiallyAsync {
     apply(substreams, queue)
   }
 
-  def apply[K](substreams: Int, queue: SourceQueue[Elem])
-    (implicit ec: ExecutionContext): SequentiallyAsync[K] = {
+  def apply[K](substreams: Int, queue: SourceQueue[Elem])(implicit ec: ExecutionContext): SequentiallyAsync[K] = {
 
     val pf: PartialFunction[Throwable, Unit] = { case _ => () }
 
@@ -62,22 +59,22 @@ object SequentiallyAsync {
           result.recover[Any](pf)
         }
         val substream = Substream(key, substreams)
-        val elem = Elem(substream, safeTask)
+        val elem      = Elem(substream, safeTask)
         for {
-          _ <- queue.offerOrError(elem, s"$key failed to enqueue task")
+          _      <- queue.offerOrError(elem, s"$key failed to enqueue task")
           result <- promise.future
         } yield result
       }
     }
   }
 
-
   def now[K]: SequentiallyAsync[K] = Now
 
-
   private object Now extends SequentiallyAsync[Any] {
+
     def async[KK <: Any, T](key: Any)(task: => Future[T]) = {
-      try task catch { case NonFatal(failure) => Future.failed(failure) }
+      try task
+      catch { case NonFatal(failure) => Future.failed(failure) }
     }
   }
 

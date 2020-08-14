@@ -13,7 +13,7 @@ trait SequentiallyMetrics {
 object SequentiallyMetrics {
 
   def empty: SequentiallyMetrics = new SequentiallyMetrics {
-    def queue(startNanos: Long): Unit = ()
+    def queue(startNanos: Long): Unit           = ()
     def run[T](future: => Future[T]): Future[T] = future
   }
 
@@ -30,9 +30,7 @@ object SequentiallyMetrics {
       * @note Must be singleton as metric names must be unique.
       * @see CollectorRegistry#register
       */
-    def apply(prometheusRegistry: CollectorRegistry,
-              prefix: String = "sequentially",
-    ): Factory = {
+    def apply(prometheusRegistry: CollectorRegistry, prefix: String = "sequentially"): Factory = {
       val time = Summary
         .build()
         .name(s"${prefix}_time")

@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 
 class SequentiallyStreamBenchmark extends Common {
 
-  var system: ActorSystem = _
+  var system: ActorSystem             = _
   var sequentially: Sequentially[Int] = _
 
   @Setup(Level.Trial)
