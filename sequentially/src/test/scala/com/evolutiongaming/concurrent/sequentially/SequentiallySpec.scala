@@ -30,7 +30,7 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
     }
 
     "run in parallel for different keys" in new Scope {
-      val promise = Promise[Int]
+      val promise = Promise[Int]()
       val future1 = sequentially(0) { await(promise.future) }
       val future2 = sequentially(0) { 2 }
       val future3 = sequentially(1) { 3 }
@@ -92,7 +92,7 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
     }
 
     "run in parallel for different keys" in new StreamScope {
-      val promise = Promise[Int]
+      val promise = Promise[Int]()
       val future1 = sequentially(0) { await(promise.future) }
       val future2 = sequentially(0) { 2 }
       val future3 = sequentially(1) { 3 }

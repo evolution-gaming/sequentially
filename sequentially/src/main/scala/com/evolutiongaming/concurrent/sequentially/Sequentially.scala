@@ -49,7 +49,7 @@ object Sequentially {
       def receive: Receive = { case Task(task) => task() }
     }
 
-    val promise = Promise[Map[Int, ActorRef]]
+    val promise = Promise[Map[Int, ActorRef]]()
 
     def supervisor() = new Actor {
       val props = Props(actor())
@@ -71,7 +71,7 @@ object Sequentially {
 
     new Sequentially[K] {
       def apply[KK <: K, T](key: KK)(task: => T): Future[T] = {
-        val promise = Promise[T]
+        val promise = Promise[T]()
         val safeTask: () => Unit = () => promise complete Try(task)
         val substream = Substream(key, substreams)
         val ref = refs(substream)
@@ -103,7 +103,7 @@ object Sequentially {
 
     new Sequentially[K] {
       def apply[KK <: K, T](key: KK)(task: => T): Future[T] = {
-        val promise = Promise[T]
+        val promise = Promise[T]()
         val safeTask = () => {
           val result = Future(task)(ec)
           promise completeWith result

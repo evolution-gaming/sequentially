@@ -6,7 +6,7 @@ lazy val commonSettings = Seq(
   organizationHomepage := Some(url("http://evolutiongaming.com")),
   bintrayOrganization := Some("evolutiongaming"),
   scalaVersion := crossScalaVersions.value.head,
-  crossScalaVersions := Seq("2.13.2", "2.12.11"),
+  crossScalaVersions := Seq("2.13.3", "2.12.11"),
   scalacOptions in(Compile, doc) += "-no-link-warnings",
   resolvers += Resolver.bintrayRepo("evolutiongaming", "maven"),
   licenses := Seq(("MIT", url("https://opensource.org/licenses/MIT"))),
@@ -25,11 +25,12 @@ lazy val sequentially = (project
   settings (name := "sequentially")
   settings commonSettings
   settings (libraryDependencies ++= Seq(
-    "com.typesafe.akka"   %% "akka-stream"    % "2.6.4",
-    "com.typesafe.akka"   %% "akka-testkit"   % "2.6.4" % Test,
-    "com.evolutiongaming" %% "executor-tools" % "1.0.2",
-    "com.evolutiongaming" %% "future-helper"  % "1.0.6",
-    "org.scalatest"       %% "scalatest"      % "3.2.1" % Test)))
+    "com.typesafe.akka"   %% "akka-stream"      % "2.6.4",
+    "com.typesafe.akka"   %% "akka-testkit"     % "2.6.4" % Test,
+    "com.evolutiongaming" %% "executor-tools"   % "1.0.2",
+    "com.evolutiongaming" %% "prometheus-tools" % "1.0.3",
+    "com.evolutiongaming" %% "future-helper"    % "1.0.6",
+    "org.scalatest"       %% "scalatest"        % "3.2.1" % Test)))
 
 lazy val benchmark = (project
   in file("benchmark")

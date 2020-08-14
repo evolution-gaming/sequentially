@@ -65,5 +65,5 @@ And also we have mixed `TrieMap` with `Sequentially`, results can be found in
 ```scala
 resolvers += Resolver.bintrayRepo("evolutiongaming", "maven")
 
-libraryDependencies += "com.evolutiongaming" %% "sequentially" % "1.0.0"
+libraryDependencies += "com.evolutiongaming" %% "sequentially" % "1.0.18"
 ```

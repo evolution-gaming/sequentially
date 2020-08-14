@@ -59,7 +59,7 @@ object SequentiallyHandler {
 
       def handler[KK <: K, T](key: KK)(task: => Future[() => Future[T]]): Future[T] = {
         val substream = Substream(key, substreams)
-        val promise = Promise[T]
+        val promise = Promise[T]()
 
         val safeTask = () => {
           val safeTask = () => task.map { task =>

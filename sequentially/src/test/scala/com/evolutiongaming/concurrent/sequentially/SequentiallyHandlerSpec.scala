@@ -15,10 +15,10 @@ class SequentiallyHandlerSpec extends AnyWordSpec with ActorSpec with Matchers {
   "SequentiallyHandler" should {
 
     "run tasks for the same key sequentially" in new Scope() {
-      val p1 = Promise[Unit]
-      val p2 = Promise[Unit]
-      val p3 = Promise[Unit]
-      val p4 = Promise[Unit]
+      val p1 = Promise[Unit]()
+      val p2 = Promise[Unit]()
+      val p3 = Promise[Unit]()
+      val p4 = Promise[Unit]()
 
       val result1 = sequentially.handler(0) {
         p1.future map { _ => () => p2.future }
@@ -45,10 +45,10 @@ class SequentiallyHandlerSpec extends AnyWordSpec with ActorSpec with Matchers {
     }
 
     "run tasks for different keys in parallel" in new Scope() {
-      val p1 = Promise[Unit]
-      val p2 = Promise[Unit]
-      val p3 = Promise[Unit]
-      val p4 = Promise[Unit]
+      val p1 = Promise[Unit]()
+      val p2 = Promise[Unit]()
+      val p3 = Promise[Unit]()
+      val p4 = Promise[Unit]()
 
       val result1 = sequentially.handler(0) {
         p1.future map { _ => () => p2.future }
