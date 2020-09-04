@@ -44,5 +44,5 @@ lazy val `sequentially-metrics` = (project
   settings commonSettings
   dependsOn sequentially
   settings (libraryDependencies ++= Seq(
-    "com.evolutiongaming" %% "prometheus-tools" % "1.0.3"
+    "com.evolutiongaming" %% "prometheus-tools" % "1.0.5"
   )))
