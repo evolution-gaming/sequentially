@@ -6,11 +6,19 @@ import scala.concurrent.Future
 
 object MeteredSequentiallyAsync {
 
+  type Factory[K] = String => SequentiallyAsync[K]
+
   def apply[K](sequentially: SequentiallyAsync[K],
                name: String,
                sequentiallyMetrics: SequentiallyMetrics.Factory,
   ): SequentiallyAsync[K] = {
     apply(sequentially, sequentiallyMetrics(name))
+  }
+
+  def apply[K](sequentially: => SequentiallyAsync[K],
+               sequentiallyMetrics: SequentiallyMetrics.Factory,
+  ): Factory[K] = {
+    name => apply(sequentially, sequentiallyMetrics(name))
   }
 
   def apply[K](sequentially: SequentiallyAsync[K],
