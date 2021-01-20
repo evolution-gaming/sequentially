@@ -1,8 +1,13 @@
-# Sequentially [![Build Status](https://travis-ci.org/evolution-gaming/sequentially.svg)](https://travis-ci.org/evolution-gaming/sequentially) [![Coverage Status](https://coveralls.io/repos/evolution-gaming/sequentially/badge.svg)](https://coveralls.io/r/evolution-gaming/sequentially) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/31ef1c904dae40d992d9537adfdad73e)](https://www.codacy.com/app/evolution-gaming/sequentially?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=evolution-gaming/sequentially&amp;utm_campaign=Badge_Grade) [ ![version](https://api.bintray.com/packages/evolutiongaming/maven/sequentially/images/download.svg) ](https://bintray.com/evolutiongaming/maven/sequentially/_latestVersion) [![License: MIT](https://img.shields.io/badge/License-MIT-yellowgreen.svg)](https://opensource.org/licenses/MIT)
+# Sequentially
+[![Build Status](https://github.com/evolution-gaming/sequentially/workflows/CI/badge.svg)](https://github.com/evolution-gaming/sequentially/actions?query=workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/evolution-gaming/sequentially/badge.svg)](https://coveralls.io/r/evolution-gaming/sequentially)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/31ef1c904dae40d992d9537adfdad73e)](https://www.codacy.com/app/evolution-gaming/sequentially?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=evolution-gaming/sequentially&amp;utm_campaign=Badge_Grade)
+[![version](https://api.bintray.com/packages/evolutiongaming/maven/sequentially/images/download.svg) ](https://bintray.com/evolutiongaming/maven/sequentially/_latestVersion)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellowgreen.svg)](https://opensource.org/licenses/MIT)
 
-This library contains `Sequentially.scala` which allows to run tasks sequentially for the same key and in parallel for different keys
+This library contains `Sequentially.scala` which allows running tasks sequentially for the same key and in parallel for different keys
 The behavior is somehow similar to what actors propose, however it provides typesafety.
-Also it is easy to write tests using `Sequentially.now` to avoid unnecessary concurrency.   
+Also, it is easy to write tests using `Sequentially.now` to avoid an unnecessary concurrency.   
 
 ```scala
 trait Sequentially[-K] {
