@@ -55,7 +55,7 @@ object SequentiallyAsync {
     new SequentiallyAsync[K] {
 
       def async[KK <: K, T](key: K)(task: => Future[T]): Future[T] = {
-        val promise = Promise[T]
+        val promise = Promise[T]()
         val safeTask = () => {
           val result = Future(task).flatten
           promise.completeWith(result)
