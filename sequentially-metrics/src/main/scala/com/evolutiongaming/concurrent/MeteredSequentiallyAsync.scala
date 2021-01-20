@@ -28,4 +28,14 @@ object MeteredSequentiallyAsync {
     }
   }
 
+  type Factory[K] = String => SequentiallyAsync[K]
+
+  object Factory {
+
+    def apply[K](sequentially: => SequentiallyAsync[K],
+                 sequentiallyMetrics: SequentiallyMetrics.Factory,
+    ): Factory[K] =
+      name => MeteredSequentiallyAsync(sequentially, sequentiallyMetrics(name))
+  }
+
 }
