@@ -67,7 +67,7 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
 
       map.getNow(0) shouldEqual Some(0)
 
-      val promise = Promise[MapDirective[K]]
+      val promise = Promise[MapDirective[K]]()
       val result = map.updateAsync(0) { before =>
         promise.future map { directive =>
           (directive, before)
@@ -119,13 +119,13 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
     }
 
     "preserve order" in new Scope {
-      val p0 = Promise[Unit]
-      val p1 = Promise[Unit]
+      val p0 = Promise[Unit]()
+      val p1 = Promise[Unit]()
       val result0 = update(1, p0, p1)
       result0.value shouldEqual None
 
-      val p2 = Promise[Unit]
-      val p3 = Promise[Unit]
+      val p2 = Promise[Unit]()
+      val p3 = Promise[Unit]()
       val result1 = update(2, p2, p3)
       result1.value shouldEqual None
 

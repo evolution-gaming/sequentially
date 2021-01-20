@@ -61,7 +61,7 @@ class AsyncMapSpec extends AnyWordSpec with Matchers {
 
       map.getNow(0) shouldEqual Some("")
 
-      val promise = Promise[MapDirective[String]]
+      val promise = Promise[MapDirective[String]]()
       val result = map.updateAsync(0) { before =>
         promise.future map { directive =>
           (directive, before)
