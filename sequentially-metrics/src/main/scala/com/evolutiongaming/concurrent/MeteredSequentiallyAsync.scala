@@ -28,14 +28,22 @@ object MeteredSequentiallyAsync {
     }
   }
 
-  type Factory[K] = String => SequentiallyAsync[K]
+  trait Factory {
+    def apply[K](name: String): SequentiallyAsync[K]
+  }
 
   object Factory {
 
-    def apply[K](sequentially: => SequentiallyAsync[K],
-                 sequentiallyMetrics: SequentiallyMetrics.Factory,
-    ): Factory[K] =
-      name => MeteredSequentiallyAsync(sequentially, sequentiallyMetrics(name))
+    trait Provider {
+      def apply[K]: SequentiallyAsync[K]
+    }
+
+    def apply(provider: Provider,
+              sequentiallyMetrics: SequentiallyMetrics.Factory,
+    ): Factory = new Factory {
+      override def apply[K](name: String): SequentiallyAsync[K] =
+        MeteredSequentiallyAsync(provider.apply[K], sequentiallyMetrics(name))
+    }
   }
 
 }
