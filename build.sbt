@@ -25,8 +25,8 @@ lazy val sequentially = (project
   settings (name := "sequentially")
   settings commonSettings
   settings (libraryDependencies ++= Seq(
-    "com.typesafe.akka"   %% "akka-stream"    % "2.6.4",
-    "com.typesafe.akka"   %% "akka-testkit"   % "2.6.4" % Test,
+    "com.typesafe.akka"   %% "akka-stream"    % "2.6.14",
+    "com.typesafe.akka"   %% "akka-testkit"   % "2.6.14" % Test,
     "com.evolutiongaming" %% "executor-tools" % "1.0.2",
     "com.evolutiongaming" %% "future-helper"  % "1.0.6",
     "org.scalatest"       %% "scalatest"      % "3.2.3" % Test)))
