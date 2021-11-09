@@ -2,7 +2,7 @@
 [![Build Status](https://github.com/evolution-gaming/sequentially/workflows/CI/badge.svg)](https://github.com/evolution-gaming/sequentially/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/evolution-gaming/sequentially/badge.svg)](https://coveralls.io/r/evolution-gaming/sequentially)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/31ef1c904dae40d992d9537adfdad73e)](https://www.codacy.com/app/evolution-gaming/sequentially?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=evolution-gaming/sequentially&amp;utm_campaign=Badge_Grade)
-[![version](https://api.bintray.com/packages/evolutiongaming/maven/sequentially/images/download.svg) ](https://bintray.com/evolutiongaming/maven/sequentially/_latestVersion)
+[![Version](https://img.shields.io/badge/version-click-blue)](https://evolution.jfrog.io/artifactory/api/search/latestVersion?g=com.evolutiongaming&a=prometheus-tools_2.13&repos=public)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellowgreen.svg)](https://opensource.org/licenses/MIT)
 
 This library contains `Sequentially.scala` which allows running tasks sequentially for the same key and in parallel for different keys
@@ -68,7 +68,7 @@ And also we have mixed `TrieMap` with `Sequentially`, results can be found in
 ## Setup
 
 ```scala
-resolvers += Resolver.bintrayRepo("evolutiongaming", "maven")
+addSbtPlugin("com.evolution" % "sbt-artifactory-plugin" % "0.0.2")
 
 libraryDependencies += "com.evolutiongaming" %% "sequentially" % "1.0.0"
 ```

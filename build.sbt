@@ -2,13 +2,12 @@ lazy val commonSettings = Seq(
   organization := "com.evolutiongaming",
   homepage := Some(new URL("http://github.com/evolution-gaming/sequentially")),
   startYear := Some(2018),
-  organizationName := "Evolution Gaming",
-  organizationHomepage := Some(url("http://evolutiongaming.com")),
-  bintrayOrganization := Some("evolutiongaming"),
+  organizationName := "Evolution",
+  organizationHomepage := Some(url("http://evolution.com")),
   scalaVersion := crossScalaVersions.value.head,
   crossScalaVersions := Seq("2.13.3", "2.12.11"),
   scalacOptions in(Compile, doc) += "-no-link-warnings",
-  resolvers += Resolver.bintrayRepo("evolutiongaming", "maven"),
+  publishTo := Some(Resolver.evolutionReleases),
   licenses := Seq(("MIT", url("https://opensource.org/licenses/MIT"))),
   releaseCrossBuild := true)
 
@@ -44,5 +43,5 @@ lazy val `sequentially-metrics` = (project
   settings commonSettings
   dependsOn sequentially
   settings (libraryDependencies ++= Seq(
-    "com.evolutiongaming" %% "prometheus-tools" % "1.0.3"
+    "com.evolutiongaming" %% "prometheus-tools" % "1.0.7"
   )))
