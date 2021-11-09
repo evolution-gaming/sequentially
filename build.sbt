@@ -5,8 +5,8 @@ lazy val commonSettings = Seq(
   organizationName := "Evolution",
   organizationHomepage := Some(url("http://evolution.com")),
   scalaVersion := crossScalaVersions.value.head,
-  crossScalaVersions := Seq("2.13.3", "2.12.11"),
-  scalacOptions in(Compile, doc) += "-no-link-warnings",
+  crossScalaVersions := Seq("2.13.7", "2.12.15"),
+  Compile / doc / scalacOptions += "-no-link-warnings",
   publishTo := Some(Resolver.evolutionReleases),
   licenses := Seq(("MIT", url("https://opensource.org/licenses/MIT"))),
   releaseCrossBuild := true)
@@ -16,7 +16,7 @@ lazy val root = (project
   in file(".")
   settings (name := "sequentially-root")
   settings commonSettings
-  settings (skip in publish := true)
+  settings (publish / skip := true)
   aggregate(sequentially, benchmark, `sequentially-metrics`))
 
 lazy val sequentially = (project
@@ -24,11 +24,11 @@ lazy val sequentially = (project
   settings (name := "sequentially")
   settings commonSettings
   settings (libraryDependencies ++= Seq(
-    "com.typesafe.akka"   %% "akka-stream"    % "2.6.4",
-    "com.typesafe.akka"   %% "akka-testkit"   % "2.6.4" % Test,
-    "com.evolutiongaming" %% "executor-tools" % "1.0.2",
+    "com.typesafe.akka"   %% "akka-stream"    % "2.6.8",
+    "com.typesafe.akka"   %% "akka-testkit"   % "2.6.8" % Test,
+    "com.evolutiongaming" %% "executor-tools" % "1.0.3",
     "com.evolutiongaming" %% "future-helper"  % "1.0.6",
-    "org.scalatest"       %% "scalatest"      % "3.2.3" % Test)))
+    "org.scalatest"       %% "scalatest"      % "3.2.10" % Test)))
 
 lazy val benchmark = (project
   in file("benchmark")
