@@ -9,7 +9,8 @@ lazy val commonSettings = Seq(
   Compile / doc / scalacOptions += "-no-link-warnings",
   publishTo := Some(Resolver.evolutionReleases),
   licenses := Seq(("MIT", url("https://opensource.org/licenses/MIT"))),
-  releaseCrossBuild := true)
+  releaseCrossBuild := true,
+  versionScheme := Some("semver-spec"))
 
 
 lazy val root = (project
