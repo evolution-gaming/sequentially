@@ -8,6 +8,9 @@ import scala.util.control.NoStackTrace
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import scala.annotation.nowarn
+
+@nowarn
 class SequentiallyAsyncSpec extends AnyWordSpec with ActorSpec with Matchers {
 
   "SequentiallyAsync" should {
