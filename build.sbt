@@ -29,7 +29,7 @@ lazy val sequentially = (project
     "com.typesafe.akka"   %% "akka-testkit"   % "2.6.19" % Test,
     "com.evolutiongaming" %% "executor-tools" % "1.0.3",
     "com.evolutiongaming" %% "future-helper"  % "1.0.6",
-    "org.scalatest"       %% "scalatest"      % "3.2.10" % Test)))
+    "org.scalatest"       %% "scalatest"      % "3.2.13" % Test)))
 
 lazy val benchmark = (project
   in file("benchmark")
