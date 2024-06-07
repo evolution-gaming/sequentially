@@ -7,7 +7,7 @@ import com.evolutiongaming.concurrent.sequentially.Sequentially.{BufferSize, Sub
 import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper._
 import com.evolutiongaming.concurrent.{AvailableProcessors, CurrentThreadExecutionContext}
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
@@ -97,7 +97,7 @@ object SequentiallyHandler {
 
   private object Now extends SequentiallyHandler[Any] {
 
-    private implicit val ec = CurrentThreadExecutionContext
+    private implicit val ec: ExecutionContext = CurrentThreadExecutionContext
 
     def handler[KK <: Any, T](key: KK)(task: => Future[() => Future[T]]): Future[T] = {
       try {

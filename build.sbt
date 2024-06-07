@@ -5,7 +5,7 @@ lazy val commonSettings = Seq(
   organizationName := "Evolution",
   organizationHomepage := Some(url("http://evolution.com")),
   scalaVersion := crossScalaVersions.value.head,
-  crossScalaVersions := Seq("2.13.7", "2.12.15"),
+  crossScalaVersions := Seq("2.13.14", "2.12.19", "3.3.3"),
   Compile / doc / scalacOptions += "-no-link-warnings",
   publishTo := Some(Resolver.evolutionReleases),
   licenses := Seq(("MIT", url("https://opensource.org/licenses/MIT"))),
@@ -27,8 +27,8 @@ lazy val sequentially = (project
   settings (libraryDependencies ++= Seq(
     "com.typesafe.akka"   %% "akka-stream"    % "2.6.19",
     "com.typesafe.akka"   %% "akka-testkit"   % "2.6.19" % Test,
-    "com.evolutiongaming" %% "executor-tools" % "1.0.3",
-    "com.evolutiongaming" %% "future-helper"  % "1.0.6",
+    "com.evolutiongaming" %% "executor-tools" % "1.0.4",
+    "com.evolutiongaming" %% "future-helper"  % "1.0.7",
     "org.scalatest"       %% "scalatest"      % "3.2.10" % Test)))
 
 lazy val benchmark = (project
@@ -44,5 +44,7 @@ lazy val `sequentially-metrics` = (project
   settings commonSettings
   dependsOn sequentially
   settings (libraryDependencies ++= Seq(
-    "com.evolutiongaming" %% "prometheus-tools" % "1.0.7"
+    "com.evolutiongaming" %% "prometheus-tools" % "1.0.8"
   )))
+
+addCommandAlias("check", "show version")
