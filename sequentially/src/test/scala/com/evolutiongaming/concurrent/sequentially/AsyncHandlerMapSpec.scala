@@ -5,7 +5,7 @@ import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
 import com.evolutiongaming.concurrent.FutureHelper._
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future, Promise}
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.util.control.NoStackTrace
 import scala.util.{Failure, Success}
 import org.scalatest.matchers.should.Matchers
@@ -13,7 +13,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
 
-  implicit val ec = CurrentThreadExecutionContext
+  implicit val ec: ExecutionContext = CurrentThreadExecutionContext
 
   type K = Int
   type V = Int
@@ -158,7 +158,7 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
     }
   }
 
-  private implicit val materializer = Materializer(system)
+  private implicit val materializer: Materializer = Materializer(system)
 
   private trait Scope {
     val key: K = 0

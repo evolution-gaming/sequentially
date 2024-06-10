@@ -91,7 +91,7 @@ class SequentiallyAsyncSpec extends AnyWordSpec with ActorSpec with Matchers {
     bufferSize: Int = Int.MaxValue,
     overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure) {
 
-    implicit val materializer = Materializer(system)
+    implicit val materializer: Materializer = Materializer(system)
 
     val sequentially = SequentiallyAsync[Int](bufferSize = bufferSize, overflowStrategy = overflowStrategy)
 

@@ -3,14 +3,14 @@ package com.evolutiongaming.concurrent.sequentially
 import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
 import com.evolutiongaming.concurrent.FutureHelper._
 
-import scala.concurrent.Promise
+import scala.concurrent.{ExecutionContext, Promise}
 import scala.util.Success
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class AsyncMapSpec extends AnyWordSpec with Matchers {
 
-  implicit val ec = CurrentThreadExecutionContext
+  implicit val ec: ExecutionContext = CurrentThreadExecutionContext
 
   "AsyncMap" should {
 

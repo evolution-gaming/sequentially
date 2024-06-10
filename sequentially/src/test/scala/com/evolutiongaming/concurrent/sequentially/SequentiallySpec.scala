@@ -4,14 +4,14 @@ import akka.stream.Materializer
 import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future, Promise}
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with ScalaFutures {
-  import system.dispatcher
+  implicit val ec: ExecutionContext = system.dispatcher
 
-  implicit val defaultPatience = PatienceConfig(5.seconds, 100.millis)
+  implicit val defaultPatience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   val n = 5
 
@@ -117,7 +117,7 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
   }
 
   private trait StreamScope extends ActorScope {
-    implicit val materializer = Materializer(system)
+    implicit val materializer: Materializer = Materializer(system)
     val sequentially: Sequentially[Int] = Sequentially[Int]()
   }
 
