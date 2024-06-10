@@ -5,7 +5,7 @@ import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
 import com.evolutiongaming.concurrent.FutureHelper._
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future, Promise, TimeoutException}
+import scala.concurrent.{Await, ExecutionContext, Future, Promise, TimeoutException}
 import scala.util.control.NoStackTrace
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -106,8 +106,8 @@ class SequentiallyHandlerSpec extends AnyWordSpec with ActorSpec with Matchers {
     }
   }
 
-  implicit val materializer = Materializer(system)
-  implicit val ec = CurrentThreadExecutionContext
+  implicit val materializer: Materializer = Materializer(system)
+  implicit val ec: ExecutionContext = CurrentThreadExecutionContext
 
   private trait Scope {
 
