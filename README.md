@@ -1,7 +1,7 @@
 # Sequentially
 [![Build Status](https://github.com/evolution-gaming/sequentially/workflows/CI/badge.svg)](https://github.com/evolution-gaming/sequentially/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/evolution-gaming/sequentially/badge.svg)](https://coveralls.io/r/evolution-gaming/sequentially)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/31ef1c904dae40d992d9537adfdad73e)](https://www.codacy.com/app/evolution-gaming/sequentially?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=evolution-gaming/sequentially&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ad6385e8c3a34c5ab99009062a13d37c)](https://app.codacy.com/gh/evolution-gaming/sequentially/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Version](https://img.shields.io/badge/version-click-blue)](https://evolution.jfrog.io/artifactory/api/search/latestVersion?g=com.evolutiongaming&a=sequentially_2.13&repos=public)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellowgreen.svg)](https://opensource.org/licenses/MIT)
 
@@ -70,5 +70,5 @@ And also we have mixed `TrieMap` with `Sequentially`, results can be found in
 ```scala
 addSbtPlugin("com.evolution" % "sbt-artifactory-plugin" % "0.0.2")
 
-libraryDependencies += "com.evolutiongaming" %% "sequentially" % "1.1.3"
+libraryDependencies += "com.evolutiongaming" %% "sequentially" % "1.1.5"
 ```
