@@ -1,16 +1,15 @@
 package com.evolutiongaming.concurrent.sequentially
 
-import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
-import com.evolutiongaming.concurrent.FutureHelper._
-
-import scala.concurrent.{ExecutionContext, Promise}
-import scala.util.Success
+import com.evolutiongaming.concurrent.FutureHelper.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import scala.concurrent.{ExecutionContext, Promise}
+import scala.util.Success
+
 class AsyncMapSpec extends AnyWordSpec with Matchers {
 
-  implicit val ec: ExecutionContext = CurrentThreadExecutionContext
+  implicit val ec: ExecutionContext = ExecutionContext.parasitic
 
   "AsyncMap" should {
 
@@ -96,4 +95,3 @@ class AsyncMapSpec extends AnyWordSpec with Matchers {
     val map = AsyncMap[Int, String](SequentiallyAsync.now)
   }
 }
-

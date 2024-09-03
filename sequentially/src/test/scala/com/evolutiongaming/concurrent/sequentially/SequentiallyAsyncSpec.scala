@@ -1,14 +1,13 @@
 package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.{Materializer, OverflowStrategy}
-
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future, Promise, TimeoutException}
-import scala.util.control.NoStackTrace
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import scala.annotation.nowarn
+import scala.concurrent.duration.*
+import scala.concurrent.{Await, Future, Promise, TimeoutException}
+import scala.util.control.NoStackTrace
 
 @nowarn
 class SequentiallyAsyncSpec extends AnyWordSpec with ActorSpec with Matchers {
@@ -89,7 +88,8 @@ class SequentiallyAsyncSpec extends AnyWordSpec with ActorSpec with Matchers {
 
   private class Scope(
     bufferSize: Int = Int.MaxValue,
-    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure) {
+    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure,
+  ) {
 
     implicit val materializer: Materializer = Materializer(system)
 
@@ -98,18 +98,16 @@ class SequentiallyAsyncSpec extends AnyWordSpec with ActorSpec with Matchers {
     val promise1 = Promise[Unit]()
     val promise2 = Promise[Unit]()
 
-    def expectTimeout[T](future: Future[T]) = {
+    def expectTimeout[T](future: Future[T]): TimeoutException = {
       the[TimeoutException] thrownBy {
         Await.result(future, 100.millis)
       }
     }
 
-    def await[T](future: Future[T]) = {
+    def await[T](future: Future[T]): T = {
       Await.result(future, 300.millis)
     }
 
     case object TestException extends RuntimeException with NoStackTrace
   }
 }
-
-

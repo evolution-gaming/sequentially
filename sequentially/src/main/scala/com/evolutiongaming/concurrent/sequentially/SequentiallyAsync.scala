@@ -2,16 +2,14 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.scaladsl.{Sink, Source, SourceQueue}
 import akka.stream.{Materializer, OverflowStrategy}
-import com.evolutiongaming.concurrent.FutureHelper._
+import com.evolutiongaming.concurrent.FutureHelper.*
 import com.evolutiongaming.concurrent.sequentially.Sequentially.{BufferSize, Substreams}
-import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper._
+import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper.*
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
-/**
-  * Runs tasks sequentially for the same key and in parallel - for different keys
-  */
+/** Runs tasks sequentially for the same key and in parallel - for different keys */
 trait SequentiallyAsync[-K] extends Sequentially[K] {
 
   def async[KK <: K, T](key: K)(task: => Future[T]): Future[T]
@@ -28,8 +26,10 @@ object SequentiallyAsync {
   def apply[K](
     substreams: Int = Substreams,
     bufferSize: Int = BufferSize,
-    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
-    (implicit materializer: Materializer): SequentiallyAsync[K] = {
+    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure,
+  )(implicit
+    materializer: Materializer
+  ): SequentiallyAsync[K] = {
 
     require(substreams > 0, s"substreams is $substreams")
     require(bufferSize > 0, s"bufferSize is $bufferSize")
@@ -42,13 +42,17 @@ object SequentiallyAsync {
       .to(Sink.ignore)
       .run()
 
-    implicit val ec = materializer.executionContext
+    implicit val ec: ExecutionContext = materializer.executionContext
 
     apply(substreams, queue)
   }
 
-  def apply[K](substreams: Int, queue: SourceQueue[Elem])
-    (implicit ec: ExecutionContext): SequentiallyAsync[K] = {
+  def apply[K](
+    substreams: Int,
+    queue: SourceQueue[Elem],
+  )(implicit
+    ec: ExecutionContext
+  ): SequentiallyAsync[K] = {
 
     val pf: PartialFunction[Throwable, Unit] = { case _ => () }
 
@@ -71,13 +75,12 @@ object SequentiallyAsync {
     }
   }
 
-
   def now[K]: SequentiallyAsync[K] = Now
 
-
   private object Now extends SequentiallyAsync[Any] {
-    def async[KK <: Any, T](key: Any)(task: => Future[T]) = {
-      try task catch { case NonFatal(failure) => Future.failed(failure) }
+    def async[KK <: Any, T](key: Any)(task: => Future[T]): Future[T] = {
+      try task
+      catch { case NonFatal(failure) => Future.failed(failure) }
     }
   }
 

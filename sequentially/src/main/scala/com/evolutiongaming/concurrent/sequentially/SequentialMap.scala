@@ -1,6 +1,6 @@
 package com.evolutiongaming.concurrent.sequentially
 
-import com.evolutiongaming.concurrent.sequentially.TrieMapHelper._
+import com.evolutiongaming.concurrent.sequentially.TrieMapHelper.*
 
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.Future
@@ -41,7 +41,7 @@ trait SequentialMap[K, V] {
   def getOrUpdate(key: K)(newValue: => V): Future[V] = {
     update(key) {
       case Some(value) => (MapDirective.ignore, value)
-      case None        =>
+      case None =>
         val value = newValue
         (MapDirective.update(value), value)
     }
@@ -61,7 +61,8 @@ object SequentialMap {
 
   def apply[K, V](
     sequentially: Sequentially[K],
-    map: TrieMap[K, V] = TrieMap.empty[K, V]): SequentialMap[K, V] = {
+    map: TrieMap[K, V] = TrieMap.empty[K, V],
+  ): SequentialMap[K, V] = {
 
     new SequentialMap[K, V] {
 

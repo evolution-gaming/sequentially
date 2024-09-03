@@ -5,7 +5,7 @@ import akka.stream.Materializer
 import org.openjdk.jmh.annotations.{Benchmark, Level, Setup, TearDown}
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class SequentiallyStreamBenchmark extends Common {
 

@@ -2,11 +2,11 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.Materializer
 import org.scalatest.concurrent.ScalaFutures
-
-import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
+import scala.concurrent.duration.*
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 
 class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with ScalaFutures {
   implicit val ec: ExecutionContext = system.dispatcher
@@ -19,10 +19,11 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
 
     "run sequentially for key" in new Scope {
 
-      val futures = for {_ <- 0 to n} yield Future {
-        val futures = for {key <- 0 to n} yield sequentially(key) { Thread.sleep(1); key }
-        Future sequence futures
-      } flatMap identity
+      val futures =
+        for { _ <- 0 to n } yield Future {
+          val futures = for { key <- 0 to n } yield sequentially(key) { Thread.sleep(1); key }
+          Future sequence futures
+        } flatMap identity
 
       for {
         xs <- (Future sequence futures).futureValue
@@ -42,7 +43,7 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
       future2.futureValue shouldEqual 2
     }
 
-    "support case class as key" in new ActorScope  {
+    "support case class as key" in new ActorScope {
       case class Key(value: String)
 
       val sequentially: Sequentially[Key] = Sequentially[Key](system)
@@ -71,7 +72,7 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
 
     "handle any key" in new Scope {
       val expected = (0 to 100).toSet
-      val futures = for { key <- expected} yield sequentially(key) { key }
+      val futures = for { key <- expected } yield sequentially(key) { key }
       val actual = Future.sequence(futures).futureValue
       actual shouldEqual expected
     }
@@ -81,10 +82,11 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
 
     "run sequentially for key" in new StreamScope {
 
-      val futures = for {_ <- 0 to n} yield Future {
-        val futures = for {key <- 0 to n} yield sequentially(key) { Thread.sleep(1); key }
-        Future sequence futures
-      } flatMap identity
+      val futures =
+        for { _ <- 0 to n } yield Future {
+          val futures = for { key <- 0 to n } yield sequentially(key) { Thread.sleep(1); key }
+          Future sequence futures
+        } flatMap identity
 
       for {
         xs <- (Future sequence futures).futureValue
@@ -121,7 +123,7 @@ class SequentiallySpec extends AnyWordSpec with ActorSpec with Matchers with Sca
     val sequentially: Sequentially[Int] = Sequentially[Int]()
   }
 
-  def await[T](future: Future[T]) = {
+  def await[T](future: Future[T]): T = {
     Await.result(future, 5.seconds)
   }
 }

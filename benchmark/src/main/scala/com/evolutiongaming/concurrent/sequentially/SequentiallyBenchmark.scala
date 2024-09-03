@@ -1,11 +1,10 @@
 package com.evolutiongaming.concurrent.sequentially
 
 import akka.actor.ActorSystem
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
-
+import scala.concurrent.duration.*
 
 class SequentiallyBenchmark extends Common {
 

@@ -1,9 +1,9 @@
 package com.evolutiongaming.concurrent.sequentially
 
-
-import scala.util.Success
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
+import scala.util.Success
 
 class SequentialMapSpec extends AnyWordSpec with Matchers {
 
@@ -65,6 +65,6 @@ class SequentialMapSpec extends AnyWordSpec with Matchers {
   }
 
   private trait Scope {
-    val map = SequentialMap[Int, String](Sequentially.now)
+    val map: SequentialMap[Int, String] = SequentialMap[Int, String](Sequentially.now)
   }
 }

@@ -9,10 +9,9 @@ trait ActorSpec extends BeforeAndAfterAll {
 
   implicit lazy val system: ActorSystem = ActorSystem(getClass.getSimpleName)
 
-  override protected def afterAll() = {
+  override protected def afterAll(): Unit = {
     TestKit.shutdownActorSystem(system)
   }
 
   abstract class ActorScope extends TestKit(system) with ImplicitSender with DefaultTimeout
 }
-

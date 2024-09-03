@@ -3,16 +3,14 @@ package com.evolutiongaming.concurrent.sequentially
 import akka.actor.{Actor, ActorRef, ActorRefFactory, Props}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{Materializer, OverflowStrategy}
-import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper._
-import com.evolutiongaming.concurrent.{AvailableProcessors, CurrentThreadExecutionContext}
+import com.evolutiongaming.concurrent.AvailableProcessors
+import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper.*
 
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future, Promise}
+import scala.concurrent.duration.*
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.util.Try
 
-/**
-  * Runs tasks sequentially for the same key and in parallel - for different keys
-  */
+/** Runs tasks sequentially for the same key and in parallel - for different keys */
 trait Sequentially[-K] {
 
   def apply[KK <: K, T](key: KK)(task: => T): Future[T]
@@ -26,7 +24,6 @@ object Sequentially {
   val BufferSize: Int = Int.MaxValue
   val Timeout: FiniteDuration = 5.seconds
 
-
   def apply[K](factory: ActorRefFactory): Sequentially[K] = {
     apply(factory, None, Substreams)
   }
@@ -35,11 +32,20 @@ object Sequentially {
     apply(factory, name, Substreams)
   }
 
-  def apply[K](factory: ActorRefFactory, name: Option[String], substreams: Int): Sequentially[K] = {
+  def apply[K](
+    factory: ActorRefFactory,
+    name: Option[String],
+    substreams: Int,
+  ): Sequentially[K] = {
     apply(factory, name, substreams, Timeout)
   }
 
-  def apply[K](factory: ActorRefFactory, name: Option[String], substreams: Int, timeout: FiniteDuration): Sequentially[K] = {
+  def apply[K](
+    factory: ActorRefFactory,
+    name: Option[String],
+    substreams: Int,
+    timeout: FiniteDuration,
+  ): Sequentially[K] = {
 
     require(substreams > 0, s"substreams is $substreams")
 
@@ -51,9 +57,9 @@ object Sequentially {
 
     val promise = Promise[Map[Int, ActorRef]]()
 
-    def supervisor() = new Actor {
-      val props = Props(actor())
-      val refs = for {
+    def supervisor(): Actor = new Actor {
+      private val props = Props(actor())
+      private val refs = for {
         substream <- 0 until substreams
       } yield {
         val ref = context.actorOf(props, name = substream.toString)
@@ -61,7 +67,7 @@ object Sequentially {
       }
       promise.success(refs.toMap)
 
-      def receive = PartialFunction.empty
+      def receive: Receive = PartialFunction.empty
     }
 
     val props = Props(supervisor())
@@ -81,12 +87,13 @@ object Sequentially {
     }
   }
 
-
   def apply[K](
     substreams: Int = Substreams,
     bufferSize: Int = BufferSize,
-    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
-    (implicit materializer: Materializer): Sequentially[K] = {
+    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure,
+  )(implicit
+    materializer: Materializer
+  ): Sequentially[K] = {
 
     val queue = Source
       .queue[Elem](bufferSize, overflowStrategy)
@@ -96,7 +103,7 @@ object Sequentially {
       .to(Sink.ignore)
       .run()(materializer)
 
-    implicit val ecNow = CurrentThreadExecutionContext
+    implicit val ecNow: ExecutionContext = ExecutionContext.parasitic
     val ec = materializer.executionContext
 
     case class Elem(substream: Int, apply: () => Future[Any])
@@ -119,7 +126,6 @@ object Sequentially {
     }
   }
 
-
   def now[K]: Sequentially[K] = Now
 
   private object Now extends Sequentially[Any] {
@@ -127,7 +133,6 @@ object Sequentially {
       Future fromTry Try(task)
     }
   }
-
 
   class Comap[A, B](tmp: A => B, sequentially: Sequentially[B]) extends Sequentially[A] {
     def apply[AA <: A, T](key: AA)(f: => T): Future[T] = sequentially(tmp(key))(f)

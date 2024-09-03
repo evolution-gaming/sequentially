@@ -2,18 +2,16 @@ package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{Materializer, OverflowStrategy}
-import com.evolutiongaming.concurrent.FutureHelper._
+import com.evolutiongaming.concurrent.AvailableProcessors
+import com.evolutiongaming.concurrent.FutureHelper.*
 import com.evolutiongaming.concurrent.sequentially.Sequentially.{BufferSize, Substreams}
-import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper._
-import com.evolutiongaming.concurrent.{AvailableProcessors, CurrentThreadExecutionContext}
+import com.evolutiongaming.concurrent.sequentially.SourceQueueHelper.*
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
-/**
-  * Runs tasks sequentially for the same key and in parallel - for different keys
-  */
+/** Runs tasks sequentially for the same key and in parallel - for different keys */
 trait SequentiallyHandler[-K] extends SequentiallyAsync[K] {
 
   def handler[KK <: K, T](key: KK)(task: => Future[() => Future[T]]): Future[T]
@@ -33,8 +31,10 @@ object SequentiallyHandler {
     substreams: Int = Substreams,
     parallelism: Int = Parallelism,
     bufferSize: Int = BufferSize,
-    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
-    (implicit materializer: Materializer): SequentiallyHandler[K] = {
+    overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure,
+  )(implicit
+    materializer: Materializer
+  ): SequentiallyHandler[K] = {
 
     require(substreams > 0, s"substreams is $substreams")
     require(bufferSize > 0, s"bufferSize is $bufferSize")
@@ -51,7 +51,7 @@ object SequentiallyHandler {
       .to(Sink.ignore)
       .run()
 
-    implicit val ec = materializer.executionContext
+    implicit val ec: ExecutionContext = materializer.executionContext
 
     case class Elem(substream: Int, apply: () => Future[() => Future[Any]])
 
@@ -62,13 +62,14 @@ object SequentiallyHandler {
         val promise = Promise[T]()
 
         val safeTask = () => {
-          val safeTask = () => task.map { task =>
-            () => {
-              val future = Future(task()).flatten
-              promise.completeWith(future)
-              future.recover[Any](pf)
+          val safeTask = () =>
+            task.map { task => () =>
+              {
+                val future = Future(task()).flatten
+                promise.completeWith(future)
+                future.recover[Any](pf)
+              }
             }
-          }
 
           Future
             .apply { safeTask() }
@@ -77,7 +78,7 @@ object SequentiallyHandler {
               case Failure(e) =>
                 promise.failure(e)
                 Success(() => Future.unit)
-              case a          => a
+              case a => a
             }
         }
 
@@ -91,13 +92,11 @@ object SequentiallyHandler {
     }
   }
 
-
   def now[T]: SequentiallyHandler[T] = Now
-
 
   private object Now extends SequentiallyHandler[Any] {
 
-    private implicit val ec: ExecutionContext = CurrentThreadExecutionContext
+    private implicit val ec: ExecutionContext = ExecutionContext.parasitic
 
     def handler[KK <: Any, T](key: KK)(task: => Future[() => Future[T]]): Future[T] = {
       try {
