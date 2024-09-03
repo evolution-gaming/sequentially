@@ -1,7 +1,7 @@
 package com.evolutiongaming.concurrent.sequentially
 
+import akka.stream.QueueOfferResult as Result
 import akka.stream.scaladsl.SourceQueue
-import akka.stream.{QueueOfferResult => Result}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -9,7 +9,12 @@ object SourceQueueHelper {
 
   implicit class SourceQueueOps[T](val self: SourceQueue[T]) extends AnyVal {
 
-    def offerOrError(elem: T, errorMsg: => String)(implicit ec: ExecutionContext): Future[Unit] = {
+    def offerOrError(
+      elem: T,
+      errorMsg: => String,
+    )(implicit
+      ec: ExecutionContext
+    ): Future[Unit] = {
       for {
         result <- self.offer(elem)
         result <- result match {
@@ -22,4 +27,5 @@ object SourceQueueHelper {
   }
 }
 
-class QueueException(message: String, cause: Option[Throwable] = None) extends RuntimeException(message, cause.orNull)
+class QueueException(message: String, cause: Option[Throwable] = None)
+  extends RuntimeException(message, cause.orNull)

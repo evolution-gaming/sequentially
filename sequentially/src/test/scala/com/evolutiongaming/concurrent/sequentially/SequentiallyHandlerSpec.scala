@@ -1,14 +1,13 @@
 package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.Materializer
-import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
-import com.evolutiongaming.concurrent.FutureHelper._
-
-import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future, Promise, TimeoutException}
-import scala.util.control.NoStackTrace
+import com.evolutiongaming.concurrent.FutureHelper.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
+import scala.concurrent.*
+import scala.concurrent.duration.*
+import scala.util.control.NoStackTrace
 
 class SequentiallyHandlerSpec extends AnyWordSpec with ActorSpec with Matchers {
 
@@ -107,19 +106,19 @@ class SequentiallyHandlerSpec extends AnyWordSpec with ActorSpec with Matchers {
   }
 
   implicit val materializer: Materializer = Materializer(system)
-  implicit val ec: ExecutionContext = CurrentThreadExecutionContext
+  implicit val ec: ExecutionContext = ExecutionContext.parasitic
 
   private trait Scope {
 
     val sequentially = SequentiallyHandler[Int]()
 
-    def expectTimeout[T](future: Future[T]) = {
+    def expectTimeout[T](future: Future[T]): TimeoutException = {
       the[TimeoutException] thrownBy {
         Await.result(future, 100.millis)
       }
     }
 
-    def await[T](future: Future[T]) = {
+    def await[T](future: Future[T]): T = {
       Await.result(future, 300.millis)
     }
   }

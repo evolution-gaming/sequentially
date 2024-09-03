@@ -1,6 +1,5 @@
 package com.evolutiongaming.concurrent.sequentially
 
-
 sealed trait MapDirective[+T]
 
 object MapDirective {
@@ -11,7 +10,6 @@ object MapDirective {
 
   def ignore[T]: MapDirective[T] = Ignore
 
-  
   final case class Update[+T](newValue: T) extends MapDirective[T]
 
   case object Remove extends MapDirective[Nothing]

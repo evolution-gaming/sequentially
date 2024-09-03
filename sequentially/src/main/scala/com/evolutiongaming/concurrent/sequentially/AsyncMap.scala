@@ -1,11 +1,10 @@
 package com.evolutiongaming.concurrent.sequentially
 
-import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
-import com.evolutiongaming.concurrent.sequentially.TrieMapHelper._
-import com.evolutiongaming.concurrent.FutureHelper._
+import com.evolutiongaming.concurrent.FutureHelper.*
+import com.evolutiongaming.concurrent.sequentially.TrieMapHelper.*
 
 import scala.collection.concurrent.TrieMap
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait AsyncMap[K, V] extends SequentialMap[K, V] {
 
@@ -18,16 +17,17 @@ object AsyncMap {
 
   def apply[K, V](
     sequentially: SequentiallyAsync[K],
-    map: TrieMap[K, V] = TrieMap.empty[K, V]): AsyncMap[K, V] = {
+    map: TrieMap[K, V] = TrieMap.empty[K, V],
+  ): AsyncMap[K, V] = {
 
-    implicit val ec = CurrentThreadExecutionContext
+    implicit val ec: ExecutionContext = ExecutionContext.parasitic
 
     new AsyncMap[K, V] {
 
-      def values = map
+      def values: TrieMap[K, V] = map
 
       def updateAsync[T](key: K)(f: Opt => Future[(Directive, T)]): Future[T] = {
-        def task = f(map.get(key)) map { case (directive, result) =>
+        def task: Future[T] = f(map.get(key)) map { case (directive, result) =>
           map.apply(key, directive)
           result
         }

@@ -1,19 +1,18 @@
 package com.evolutiongaming.concurrent.sequentially
 
 import akka.stream.Materializer
-import com.evolutiongaming.concurrent.CurrentThreadExecutionContext
-import com.evolutiongaming.concurrent.FutureHelper._
-
-import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
-import scala.util.control.NoStackTrace
-import scala.util.{Failure, Success}
+import com.evolutiongaming.concurrent.FutureHelper.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import scala.concurrent.duration.*
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
+import scala.util.control.NoStackTrace
+import scala.util.{Failure, Success}
+
 class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
 
-  implicit val ec: ExecutionContext = CurrentThreadExecutionContext
+  implicit val ec: ExecutionContext = ExecutionContext.parasitic
 
   type K = Int
   type V = Int
@@ -154,7 +153,9 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
       map.update(key) { _ => throw TestException }.value shouldEqual Some(Failure(TestException))
       map.updateAsync(key) { _ => Future.failed(TestException) }.value shouldEqual Some(Failure(TestException))
       map.updateHandler(key) { _ => throw TestException }.value shouldEqual Some(Failure(TestException))
-      map.updateHandler(key) { _ => Future.failed(TestException) }.value shouldEqual Some(Failure(TestException))
+      map.updateHandler(key) { _ => Future.failed(TestException) }.value shouldEqual Some(
+        Failure(TestException)
+      )
     }
   }
 
@@ -164,14 +165,17 @@ class AsyncHandlerMapSpec extends AnyWordSpec with Matchers with ActorSpec {
     val key: K = 0
     val map = AsyncHandlerMap[K, V](sequentially)
 
-    def update(idx: Int, p0: Promise[Unit], p1: Promise[Unit]): Future[Int] = {
+    def update(
+      idx: Int,
+      p0: Promise[Unit],
+      p1: Promise[Unit],
+    ): Future[Int] = {
       map.updateHandler[Int](key) { _ =>
-        p0.future map { _ =>
-          (_: Option[V]) =>
-            p1.future map { _ =>
-              val directive = MapDirective.update(idx)
-              (directive, idx)
-            }
+        p0.future map { _ => (_: Option[V]) =>
+          p1.future map { _ =>
+            val directive = MapDirective.update(idx)
+            (directive, idx)
+          }
         }
       }
     }

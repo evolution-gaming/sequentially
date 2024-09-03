@@ -10,7 +10,8 @@ class SubstreamSpec extends AnyFunSuite with Matchers {
       (1, 1),
       (10, 0),
       (Int.MaxValue, 7),
-      (Int.MinValue, 8))
+      (Int.MinValue, 8),
+    )
   } {
     test(s"return $substream for $key") {
       Substream(key, 10) shouldEqual substream
