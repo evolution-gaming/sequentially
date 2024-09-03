@@ -22,10 +22,7 @@ lazy val commonSettings = Seq(
 
 // Your next release will be binary compatible with the previous one,
 // but it may not be source compatible (ie, it will be a minor release).
-//
-// It is not set to BinaryAndSourceCompatible because prometheus-tools was bumped from 1.0.8 to 1.1.0.
-// Otherwise, 1.2.0 is both source and binary compatible with 1.1.5.
-ThisBuild / versionPolicyIntention := Compatibility.BinaryCompatible
+ThisBuild / versionPolicyIntention := Compatibility.BinaryAndSourceCompatible
 
 lazy val root = (project
   in file(".")

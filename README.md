@@ -70,5 +70,5 @@ And also we have mixed `TrieMap` with `Sequentially`, results can be found in
 ```scala
 addSbtPlugin("com.evolution" % "sbt-artifactory-plugin" % "0.0.2")
 
-libraryDependencies += "com.evolutiongaming" %% "sequentially" % "1.1.5"
+libraryDependencies += "com.evolutiongaming" %% "sequentially" % "1.2.0"
 ```
