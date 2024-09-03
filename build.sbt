@@ -22,7 +22,10 @@ lazy val commonSettings = Seq(
 
 // Your next release will be binary compatible with the previous one,
 // but it may not be source compatible (ie, it will be a minor release).
-ThisBuild / versionPolicyIntention := Compatibility.BinaryAndSourceCompatible
+//
+// It is not set to BinaryAndSourceCompatible because prometheus-tools was bumped from 1.0.8 to 1.1.0.
+// Otherwise, 1.2.0 is both source and binary compatible with 1.1.5.
+ThisBuild / versionPolicyIntention := Compatibility.BinaryCompatible
 
 lazy val root = (project
   in file(".")
@@ -39,7 +42,7 @@ lazy val sequentially = (project
     "com.typesafe.akka" %% "akka-stream" % "2.6.21",
     "com.typesafe.akka" %% "akka-testkit" % "2.6.21" % Test,
     "com.evolutiongaming" %% "future-helper" % "1.0.7",
-    "org.scalatest" %% "scalatest" % "3.2.10" % Test,
+    "org.scalatest" %% "scalatest" % "3.2.19" % Test,
   )))
 
 lazy val benchmark = (project
@@ -55,7 +58,7 @@ lazy val `sequentially-metrics` = (project
   settings commonSettings
   dependsOn sequentially
   settings (libraryDependencies ++= Seq(
-    "com.evolutiongaming" %% "prometheus-tools" % "1.0.8"
+    "com.evolutiongaming" %% "prometheus-tools" % "1.1.0"
   )))
 
 //used by evolution-gaming/scala-github-actions

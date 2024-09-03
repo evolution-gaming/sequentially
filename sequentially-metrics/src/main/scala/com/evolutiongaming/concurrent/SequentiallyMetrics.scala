@@ -46,7 +46,7 @@ object SequentiallyMetrics {
           }
 
           def run[T](future: => Future[T]): Future[T] = {
-            time.labels(name, "run").timeFutureNanos(future)
+            time.labels(name, "run").timeFuture(future)
           }
         }
     }
