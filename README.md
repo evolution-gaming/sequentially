@@ -39,6 +39,13 @@ val stateBefore: Future[Int] = sequentially(()) {
 } 
 ```
 
+### Pekko support
+
+The project supports the Pekko implementation. To use it, add the suffix '-pekko' to the artefact name. For example, 
+```scala
+libraryDependencies += "com.evolutiongaming" %% "sequentially-pekko" % "2.0.0"
+```
+
 ## Other good stuff
 
 We usually have more complicated requirements in real life applications, 
@@ -70,5 +77,5 @@ And also we have mixed `TrieMap` with `Sequentially`, results can be found in
 ```scala
 addSbtPlugin("com.evolution" % "sbt-artifactory-plugin" % "0.0.2")
 
-libraryDependencies += "com.evolutiongaming" %% "sequentially" % "1.2.0"
+libraryDependencies += "com.evolutiongaming" %% "sequentially" % "2.0.0"
 ```
