@@ -38,7 +38,7 @@ lazy val root = (project
       benchmark.projectRefs ++
       `sequentially-metrics`.projectRefs: _*
   ))
-
+lazy val PekkoVersion = "1.1.3"
 lazy val sequentially = (projectMatrix
   in file("sequentially")
   settings (name := "sequentially")
@@ -53,8 +53,12 @@ lazy val sequentially = (projectMatrix
     configure = _.settings(
       moduleName := moduleName.value + "-pekko",
       libraryDependencies ++= Seq(
-        "com.evolution" %% "akka-to-pekko-adapter-actor" % "0.0.4",
-        "com.evolution" %% "akka-to-pekko-adapter-stream" % "0.0.4",
+        "org.apache.pekko" %% "pekko-actor" % PekkoVersion,
+        "org.apache.pekko" %% "pekko-stream" % PekkoVersion,
+        "org.apache.pekko" %% "pekko-testkit" % PekkoVersion,
+        "com.evolution" %% "akka-to-pekko-adapter-actor" % "0.0.5",
+        "com.evolution" %% "akka-to-pekko-adapter-stream" % "0.0.5",
+        "com.evolution" %% "akka-to-pekko-adapter-test-kit" % "0.0.5" % Test,
       ),
     ),
   )
