@@ -39,6 +39,13 @@ val stateBefore: Future[Int] = sequentially(()) {
 } 
 ```
 
+### Pekko support
+
+The project supports the Pekko implementation. To use it, add the suffix '-pekko' to the artefact name. For example, 
+```scala
+libraryDependencies += "com.evolutiongaming" %% "sequentially-pekko" % "1.2.0"
+```
+
 ## Other good stuff
 
 We usually have more complicated requirements in real life applications, 
