@@ -8,7 +8,7 @@ lazy val commonSettings = Seq(
   startYear := Some(2018),
   organizationName := "Evolution",
   organizationHomepage := Some(url("https://evolution.com")),
-  scalaVersion := crossScalaVersions.value.head,
+  scalaVersion := ScalaVersions.head,
   Compile / scalacOptions ++= {
     if (scalaBinaryVersion.value == "2.13") {
       Seq(
