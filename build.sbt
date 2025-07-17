@@ -26,7 +26,7 @@ lazy val commonSettings = Seq(
 
 // Your next release will be binary compatible with the previous one,
 // but it may not be source compatible (ie, it will be a minor release).
-ThisBuild / versionPolicyIntention := Compatibility.BinaryAndSourceCompatible
+ThisBuild / versionPolicyIntention := Compatibility.None
 
 lazy val root = (project
   in file(".")
