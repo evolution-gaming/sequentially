@@ -37,7 +37,7 @@ lazy val root = (project
       benchmark.projectRefs ++
       `sequentially-metrics`.projectRefs: _*
   ))
-lazy val PekkoVersion = "1.1.3"
+lazy val PekkoVersion = "1.1.5"
 lazy val sequentially = (projectMatrix
   in file("sequentially")
   settings (name := "sequentially")
