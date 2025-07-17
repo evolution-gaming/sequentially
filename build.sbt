@@ -56,7 +56,6 @@ lazy val sequentially = (projectMatrix
         "com.evolution" %% "akka-to-pekko-adapter-actor" % "0.0.4",
         "com.evolution" %% "akka-to-pekko-adapter-stream" % "0.0.4",
       ),
-      versionPolicyCheck / skip := true,
     ),
   )
   .jvmPlatform(
@@ -80,8 +79,7 @@ lazy val benchmark = (projectMatrix
     scalaVersions = ScalaVersions,
     axisValues = Seq(ConfigAxis.Provider.pekko),
     configure = _.settings(
-      moduleName := moduleName.value + "-pekko",
-      versionPolicyCheck / skip := true,
+      moduleName := moduleName.value + "-pekko"
     ),
   )
   .jvmPlatform(
@@ -102,16 +100,13 @@ lazy val `sequentially-metrics` = (projectMatrix
     scalaVersions = ScalaVersions,
     axisValues = Seq(ConfigAxis.Provider.pekko),
     configure = _.settings(
-      moduleName := moduleName.value + "-pekko",
-      versionPolicyCheck / skip := true,
+      moduleName := moduleName.value + "-pekko"
     ),
   )
   .jvmPlatform(
     scalaVersions = ScalaVersions,
     axisValues = Seq(ConfigAxis.Provider.akka),
-    configure = _.settings(
-      versionPolicyCheck / skip := true
-    ),
+    configure = identity,
   )
 
 //used by evolution-gaming/scala-github-actions
