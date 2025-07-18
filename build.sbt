@@ -1,3 +1,4 @@
+import sbt.Keys.publish
 import sbt.internal.ProjectMatrix
 
 lazy val ScalaVersions = Seq("2.13.16", "3.3.3")
@@ -8,7 +9,6 @@ lazy val commonSettings = Seq(
   startYear := Some(2018),
   organizationName := "Evolution",
   organizationHomepage := Some(url("https://evolution.com")),
-  scalaVersion := ScalaVersions.head,
   Compile / scalacOptions ++= {
     if (scalaBinaryVersion.value == "2.13") {
       Seq(
@@ -19,7 +19,6 @@ lazy val commonSettings = Seq(
   Compile / doc / scalacOptions += "-no-link-warnings",
   publishTo := Some(Resolver.evolutionReleases),
   licenses := Seq(("MIT", url("https://opensource.org/licenses/MIT"))),
-  releaseCrossBuild := true,
   versionScheme := Some("semver-spec"),
 )
 
