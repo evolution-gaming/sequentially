@@ -1,7 +1,7 @@
 import sbt.Keys.publish
 import sbt.internal.ProjectMatrix
 
-lazy val ScalaVersions = Seq("2.13.16", "3.3.3")
+lazy val ScalaVersions = Seq("2.13.16", "3.3.6")
 
 lazy val commonSettings = Seq(
   organization := "com.evolutiongaming",
