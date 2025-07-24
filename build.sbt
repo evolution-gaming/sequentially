@@ -53,7 +53,7 @@ lazy val sequentially = (projectMatrix
       libraryDependencies ++= Seq(
         "org.apache.pekko" %% "pekko-actor" % PekkoVersion,
         "org.apache.pekko" %% "pekko-stream" % PekkoVersion,
-        "org.apache.pekko" %% "pekko-testkit" % PekkoVersion,
+        "org.apache.pekko" %% "pekko-testkit" % PekkoVersion % Test,
         "com.evolution" %% "akka-to-pekko-adapter-actor" % "0.0.5",
         "com.evolution" %% "akka-to-pekko-adapter-stream" % "0.0.5",
         "com.evolution" %% "akka-to-pekko-adapter-test-kit" % "0.0.5" % Test,
