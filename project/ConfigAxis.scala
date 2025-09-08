@@ -1,4 +1,4 @@
-import sbt.{VirtualAxis, *}
+import sbt.VirtualAxis
 
 case class ConfigAxis(idSuffix: String, directorySuffix: String) extends VirtualAxis.StrongAxis {}
 

@@ -49,10 +49,8 @@ object Sequentially {
 
     require(substreams > 0, s"substreams is $substreams")
 
-    case class Task(task: () => Unit)
-
     def actor() = new Actor {
-      def receive: Receive = { case Task(task) => task() }
+      def receive: Receive = { case TaskActorMsg(task) => task() }
     }
 
     val promise = Promise[Map[Int, ActorRef]]()
@@ -81,7 +79,7 @@ object Sequentially {
         val safeTask: () => Unit = () => promise complete Try(task)
         val substream = Substream(key, substreams)
         val ref = refs(substream)
-        ref.tell(Task(safeTask), ActorRef.noSender)
+        ref.tell(TaskActorMsg(safeTask), ActorRef.noSender)
         promise.future
       }
     }
@@ -137,4 +135,6 @@ object Sequentially {
   class Comap[A, B](tmp: A => B, sequentially: Sequentially[B]) extends Sequentially[A] {
     def apply[AA <: A, T](key: AA)(f: => T): Future[T] = sequentially(tmp(key))(f)
   }
+
+  private final case class TaskActorMsg(task: () => Unit)
 }

@@ -1,7 +1,8 @@
-import sbt.Keys.publish
+import ProjectMatrixSyntax.*
+import sbt.Keys.*
 import sbt.internal.ProjectMatrix
 
-lazy val ScalaVersions = Seq("2.13.16", "3.3.3")
+lazy val scalaVersions = Seq("2.13.16", "3.3.6")
 
 lazy val commonSettings = Seq(
   organization := "com.evolutiongaming",
@@ -9,6 +10,9 @@ lazy val commonSettings = Seq(
   startYear := Some(2018),
   organizationName := "Evolution",
   organizationHomepage := Some(url("https://evolution.com")),
+  licenses := Seq(("MIT", url("https://opensource.org/licenses/MIT"))),
+
+  // compiler settings
   Compile / scalacOptions ++= {
     if (scalaBinaryVersion.value == "2.13") {
       Seq(
@@ -17,99 +21,76 @@ lazy val commonSettings = Seq(
     } else Seq.empty
   },
   Compile / doc / scalacOptions += "-no-link-warnings",
+
+  // publishing and versioning settings
   publishTo := Some(Resolver.evolutionReleases),
-  licenses := Seq(("MIT", url("https://opensource.org/licenses/MIT"))),
   versionScheme := Some("semver-spec"),
+  versionPolicyIntention := Compatibility.BinaryCompatible,
 )
 
-// Your next release will be binary compatible with the previous one,
-// but it may not be source compatible (ie, it will be a minor release).
-ThisBuild / versionPolicyIntention := Compatibility.None
-
-lazy val root = (project
-  in file(".")
-  settings (name := "sequentially-root")
-  settings commonSettings
-  settings (publish / skip := true)
-  aggregate (
-    sequentially.projectRefs ++
+lazy val root = project
+  .in(file("."))
+  .settings(commonSettings)
+  .settings(
+    name := "sequentially-root",
+    publish / skip := true,
+    // setting the Scala version so this module does not pull scalafix & others for 2.12
+    scalaVersion := scalaVersions.head,
+  )
+  .aggregate(
+    (sequentially.projectRefs ++
       benchmark.projectRefs ++
-      `sequentially-metrics`.projectRefs: _*
+      `sequentially-metrics`.projectRefs) *
+  )
+
+lazy val sequentially = projectMatrix
+  .in(file("sequentially"))
+  .settings(commonSettings)
+  .settings(
+    name := "sequentially"
+  )
+  .settings(
+    libraryDependencies ++= Seq(
+      Dependencies.FutureHelper,
+      Dependencies.Scalatest % Test,
+    )
+  )
+  .configureMatrix(asAkkaPekkoModule(
+    akkaDependencies = Seq(
+      Dependencies.Akka.Stream,
+      Dependencies.Akka.Testkit % Test,
+    ),
+    pekkoDependencies = Seq(
+      Dependencies.Pekko.Stream,
+      Dependencies.Pekko.Testkit % Test,
+      Dependencies.AkkaToPekkoAdapter.Actor,
+      Dependencies.AkkaToPekkoAdapter.Stream,
+      Dependencies.AkkaToPekkoAdapter.Testkit % Test,
+    ),
   ))
-lazy val PekkoVersion = "1.1.3"
-lazy val sequentially = (projectMatrix
-  in file("sequentially")
-  settings (name := "sequentially")
-  settings commonSettings
-  settings (libraryDependencies ++= Seq(
-    "com.evolutiongaming" %% "future-helper" % "1.0.7",
-    "org.scalatest" %% "scalatest" % "3.2.19" % Test,
-  )))
-  .jvmPlatform(
-    scalaVersions = ScalaVersions,
-    axisValues = Seq(ConfigAxis.Provider.pekko),
-    configure = _.settings(
-      moduleName := moduleName.value + "-pekko",
-      libraryDependencies ++= Seq(
-        "org.apache.pekko" %% "pekko-actor" % PekkoVersion,
-        "org.apache.pekko" %% "pekko-stream" % PekkoVersion,
-        "org.apache.pekko" %% "pekko-testkit" % PekkoVersion % Test,
-        "com.evolution" %% "akka-to-pekko-adapter-actor" % "0.0.5",
-        "com.evolution" %% "akka-to-pekko-adapter-stream" % "0.0.5",
-        "com.evolution" %% "akka-to-pekko-adapter-test-kit" % "0.0.5" % Test,
-      ),
-    ),
-  )
-  .jvmPlatform(
-    scalaVersions = ScalaVersions,
-    axisValues = Seq(ConfigAxis.Provider.akka),
-    configure = _.settings(
-      libraryDependencies ++= Seq(
-        "com.typesafe.akka" %% "akka-stream" % "2.6.21",
-        "com.typesafe.akka" %% "akka-testkit" % "2.6.21" % Test,
-      )
-    ),
-  )
 
-lazy val benchmark = (projectMatrix
-  in file("benchmark")
-  enablePlugins JmhPlugin
-  settings (name := "benchmark")
-  settings commonSettings
-  dependsOn sequentially % "compile->compile")
-  .jvmPlatform(
-    scalaVersions = ScalaVersions,
-    axisValues = Seq(ConfigAxis.Provider.pekko),
-    configure = _.settings(
-      moduleName := moduleName.value + "-pekko"
-    ),
+lazy val benchmark = projectMatrix
+  .in(file("benchmark"))
+  .settings(commonSettings)
+  .enablePlugins(JmhPlugin)
+  .settings(
+    name := "benchmark",
+    publish / skip := true,
   )
-  .jvmPlatform(
-    scalaVersions = ScalaVersions,
-    axisValues = Seq(ConfigAxis.Provider.akka),
-    configure = identity,
-  )
+  .dependsOn(sequentially)
+  .configureMatrix(asAkkaPekkoModule())
 
-lazy val `sequentially-metrics` = (projectMatrix
-  in file("sequentially-metrics")
-  settings (name := "sequentially-metrics")
-  settings commonSettings
-  dependsOn sequentially % "compile->compile"
-  settings (libraryDependencies ++= Seq(
-    "com.evolutiongaming" %% "prometheus-tools" % "1.1.0"
-  )))
-  .jvmPlatform(
-    scalaVersions = ScalaVersions,
-    axisValues = Seq(ConfigAxis.Provider.pekko),
-    configure = _.settings(
-      moduleName := moduleName.value + "-pekko"
-    ),
+lazy val `sequentially-metrics` = projectMatrix
+  .in(file("sequentially-metrics"))
+  .settings(commonSettings)
+  .settings(name := "sequentially-metrics")
+  .dependsOn(sequentially)
+  .settings(
+    libraryDependencies ++= Seq(
+      Dependencies.PrometheusTools
+    )
   )
-  .jvmPlatform(
-    scalaVersions = ScalaVersions,
-    axisValues = Seq(ConfigAxis.Provider.akka),
-    configure = identity,
-  )
+  .configureMatrix(asAkkaPekkoModule())
 
 //used by evolution-gaming/scala-github-actions
 addCommandAlias(
@@ -118,3 +99,27 @@ addCommandAlias(
 )
 
 addCommandAlias("fmtAll", "all scalafmtAll scalafmtSbt; scalafixEnable; scalafixAll")
+
+def asAkkaPekkoModule(
+  akkaDependencies: Seq[ModuleID] = Seq.empty,
+  pekkoDependencies: Seq[ModuleID] = Seq.empty,
+)(
+  p: ProjectMatrix
+): ProjectMatrix = {
+  p
+    .jvmPlatform(
+      scalaVersions = scalaVersions,
+      axisValues = Seq(ConfigAxis.Provider.pekko),
+      configure = _.settings(
+        moduleName := moduleName.value + "-pekko",
+        libraryDependencies ++= pekkoDependencies,
+      ),
+    )
+    .jvmPlatform(
+      scalaVersions = scalaVersions,
+      axisValues = Seq(ConfigAxis.Provider.akka),
+      configure = _.settings(
+        libraryDependencies ++= akkaDependencies
+      ),
+    )
+}
