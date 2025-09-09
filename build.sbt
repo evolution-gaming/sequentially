@@ -1,3 +1,4 @@
+import Dependencies.*
 import ProjectMatrixSyntax.*
 import sbt.Keys.*
 import sbt.internal.ProjectMatrix
@@ -51,21 +52,21 @@ lazy val sequentially = projectMatrix
   )
   .settings(
     libraryDependencies ++= Seq(
-      Dependencies.FutureHelper,
-      Dependencies.Scalatest % Test,
+      FutureHelper,
+      Scalatest % Test,
     )
   )
   .configureMatrix(asAkkaPekkoModule(
     akkaDependencies = Seq(
-      Dependencies.Akka.Stream,
-      Dependencies.Akka.Testkit % Test,
+      Akka.Stream,
+      Akka.Testkit % Test,
     ),
     pekkoDependencies = Seq(
-      Dependencies.Pekko.Stream,
-      Dependencies.Pekko.Testkit % Test,
-      Dependencies.AkkaToPekkoAdapter.Actor,
-      Dependencies.AkkaToPekkoAdapter.Stream,
-      Dependencies.AkkaToPekkoAdapter.Testkit % Test,
+      Pekko.Stream,
+      Pekko.Testkit % Test,
+      AkkaToPekkoAdapter.Actor,
+      AkkaToPekkoAdapter.Stream,
+      AkkaToPekkoAdapter.Testkit % Test,
     ),
   ))
 
@@ -87,7 +88,7 @@ lazy val `sequentially-metrics` = projectMatrix
   .dependsOn(sequentially)
   .settings(
     libraryDependencies ++= Seq(
-      Dependencies.PrometheusTools
+      PrometheusTools
     )
   )
   .configureMatrix(asAkkaPekkoModule())
