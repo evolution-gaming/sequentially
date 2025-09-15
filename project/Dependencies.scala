@@ -21,7 +21,7 @@ object Dependencies {
   }
 
   object AkkaToPekkoAdapter {
-    private val Version = "1.0.0"
+    private val Version = "1.0.2"
 
     val Actor = "com.evolution" %% "akka-to-pekko-adapter-actor" % Version
     val Stream = "com.evolution" %% "akka-to-pekko-adapter-stream" % Version
