@@ -14,7 +14,7 @@ object Dependencies {
   }
 
   object Pekko {
-    private val Version = "1.2.0"
+    private val Version = "1.2.1"
 
     val Stream = "org.apache.pekko" %% "pekko-stream" % Version
     val Testkit = "org.apache.pekko" %% "pekko-testkit" % Version
