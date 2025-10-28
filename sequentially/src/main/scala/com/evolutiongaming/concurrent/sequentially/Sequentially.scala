@@ -24,14 +24,17 @@ object Sequentially {
   val BufferSize: Int = Int.MaxValue
   val Timeout: FiniteDuration = 5.seconds
 
+//  @deprecated("Akka/Pekko version is out of support", since = "3.1.0")
   def apply[K](factory: ActorRefFactory): Sequentially[K] = {
     apply(factory, None, Substreams)
   }
 
+//  @deprecated("Akka/Pekko version is out of support", since = "3.1.0")
   def apply[K](factory: ActorRefFactory, name: Option[String]): Sequentially[K] = {
     apply(factory, name, Substreams)
   }
 
+//  @deprecated("Akka/Pekko version is out of support", since = "3.1.0")
   def apply[K](
     factory: ActorRefFactory,
     name: Option[String],
@@ -40,6 +43,7 @@ object Sequentially {
     apply(factory, name, substreams, Timeout)
   }
 
+//  @deprecated("Akka/Pekko version is out of support", since = "3.1.0")
   def apply[K](
     factory: ActorRefFactory,
     name: Option[String],
@@ -85,6 +89,7 @@ object Sequentially {
     }
   }
 
+//  @deprecated("Akka/Pekko version is out of support", since = "3.1.0")
   def apply[K](
     substreams: Int = Substreams,
     bufferSize: Int = BufferSize,

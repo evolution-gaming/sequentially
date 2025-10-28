@@ -53,6 +53,9 @@ lazy val sequentially = projectMatrix
   .settings(
     libraryDependencies ++= Seq(
       FutureHelper,
+      Dependencies.catsCore,
+      Dependencies.CatsEffect.effect,
+      Dependencies.CatsEffect.laws,
       Scalatest % Test,
     )
   )
@@ -67,6 +70,9 @@ lazy val sequentially = projectMatrix
       AkkaToPekkoAdapter.Actor,
       AkkaToPekkoAdapter.Stream,
       AkkaToPekkoAdapter.Testkit % Test,
+      CatsEffect.effect,
+      CatsEffect.laws,
+      Dependencies.catsCore
     ),
   ))
 

@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit
     "-XX:MaxNewSize=512m",
     "-XX:InitialCodeCacheSize=256m",
     "-XX:ReservedCodeCacheSize=256m",
-    "-XX:-UseBiasedLocking",
     "-XX:+AlwaysPreTouch",
     "-XX:+UseParallelGC",
   ),
