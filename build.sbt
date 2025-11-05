@@ -1,6 +1,7 @@
 import Dependencies.*
 import ProjectMatrixSyntax.*
 import sbt.Keys.*
+import sbt.Project.projectToRef
 import sbt.internal.ProjectMatrix
 
 lazy val scalaVersions = Seq("2.13.16", "3.3.6")
@@ -40,15 +41,18 @@ lazy val root = project
   )
   .aggregate(
     (sequentially.projectRefs ++
-      benchmark.projectRefs ++
-      `sequentially-metrics`.projectRefs) *
+      `sequentially-ce`.projectRefs ++
+      `sequentially-metrics`.projectRefs :+
+      projectToRef(benchmark)): _*
   )
+
 
 lazy val sequentially = projectMatrix
   .in(file("sequentially"))
   .settings(commonSettings)
   .settings(
-    name := "sequentially"
+    name := "sequentially",
+    Test / scalacOptions -= "-Xfatal-warnings", // Allow deprecation warnings in tests
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -70,22 +74,47 @@ lazy val sequentially = projectMatrix
       AkkaToPekkoAdapter.Actor,
       AkkaToPekkoAdapter.Stream,
       AkkaToPekkoAdapter.Testkit % Test,
-      CatsEffect.effect,
-      CatsEffect.laws,
-      Dependencies.catsCore
     ),
   ))
 
-lazy val benchmark = projectMatrix
+lazy val `sequentially-ce` = projectMatrix
+  .in(file("sequentially-ce"))
+  .settings(commonSettings)
+  .settings(
+    name := "sequentially-ce"
+  )
+  .settings(
+    libraryDependencies ++= Seq(
+      FutureHelper,
+      Dependencies.catsCore,
+      Dependencies.CatsEffect.effect,
+      Dependencies.CatsEffect.laws,
+      Scalatest % Test,
+    ),
+    excludeDependencies ++= Seq(
+      ExclusionRule("com.typesafe.akka"),
+      ExclusionRule("org.apache.pekko")
+    )
+  )
+  .jvmPlatform(scalaVersions = scalaVersions)
+
+
+
+lazy val benchmark = project
   .in(file("benchmark"))
   .settings(commonSettings)
   .enablePlugins(JmhPlugin)
   .settings(
     name := "benchmark",
     publish / skip := true,
+    scalaVersion := scalaVersions.head,
+    crossScalaVersions := Seq(scalaVersions.head),
+    Compile / scalacOptions -= "-Xfatal-warnings", // Allow deprecation warnings for benchmark
   )
-  .dependsOn(sequentially)
-  .configureMatrix(asAkkaPekkoModule())
+  .dependsOn(
+    sequentially.finder(ConfigAxis.Provider.akka)(scalaVersions.head),
+    `sequentially-ce`.finder()(scalaVersions.head)
+  )
 
 lazy val `sequentially-metrics` = projectMatrix
   .in(file("sequentially-metrics"))
@@ -130,3 +159,4 @@ def asAkkaPekkoModule(
       ),
     )
 }
+
