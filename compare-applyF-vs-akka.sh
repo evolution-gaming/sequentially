@@ -30,8 +30,8 @@ echo -e "  3. ${CYAN}Cats.apply (Future)${NC} - Cats with Future conversion"
 echo ""
 
 sbt "project benchmark" "Jmh/run \
-  -i 5 \
-  -wi 5 \
+  -i 3 \
+  -wi 2 \
   -f 1 \
   -t 1 \
   -rf json \

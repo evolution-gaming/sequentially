@@ -2,6 +2,7 @@ package com.evolutiongaming.concurrent.sequentially
 
 import cats.effect.IO
 import cats.effect.std.{Dispatcher, Semaphore}
+import cats.effect.unsafe.IORuntime
 import cats.effect.unsafe.implicits.global
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
@@ -19,6 +20,9 @@ class SequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutures with
     timeout = Span(10, Seconds),
     interval = Span(50, Millis),
   )
+
+  implicit val dispatcher: Dispatcher[IO] =
+    Dispatcher.parallel[IO].allocated.unsafeRunSync()(IORuntime.global)._1
 
   "SequentiallyF" should {
 
