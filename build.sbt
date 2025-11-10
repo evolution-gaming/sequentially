@@ -46,7 +46,6 @@ lazy val root = project
       projectToRef(benchmark)): _*
   )
 
-
 lazy val sequentially = projectMatrix
   .in(file("sequentially"))
   .settings(commonSettings)
@@ -93,12 +92,10 @@ lazy val `sequentially-ce` = projectMatrix
     ),
     excludeDependencies ++= Seq(
       ExclusionRule("com.typesafe.akka"),
-      ExclusionRule("org.apache.pekko")
-    )
+      ExclusionRule("org.apache.pekko"),
+    ),
   )
   .jvmPlatform(scalaVersions = scalaVersions)
-
-
 
 lazy val benchmark = project
   .in(file("benchmark"))
@@ -113,7 +110,7 @@ lazy val benchmark = project
   )
   .dependsOn(
     sequentially.finder(ConfigAxis.Provider.akka)(scalaVersions.head),
-    `sequentially-ce`.finder()(scalaVersions.head)
+    `sequentially-ce`.finder()(scalaVersions.head),
   )
 
 lazy val `sequentially-metrics` = projectMatrix
@@ -159,4 +156,3 @@ def asAkkaPekkoModule(
       ),
     )
 }
-

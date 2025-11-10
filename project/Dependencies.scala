@@ -31,9 +31,9 @@ object Dependencies {
   object CatsEffect {
     private val Version = "3.6.3"
 
-    val effect = "org.typelevel" %% "cats-effect"      % Version
-    val laws   = "org.typelevel" %% "cats-effect-laws" % Version % Test
+    val effect = "org.typelevel" %% "cats-effect" % Version
+    val laws = "org.typelevel" %% "cats-effect-laws" % Version % Test
   }
 
-  val catsCore = "org.typelevel" %% "cats-core"     % "2.13.0"
+  val catsCore = "org.typelevel" %% "cats-core" % "2.13.0"
 }
