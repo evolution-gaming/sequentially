@@ -14,10 +14,8 @@ import scala.concurrent.Future
   * - Number of buckets: (availableProcessors max 1) * 5
   * - All semaphores are pre-allocated at initialization
   */
-final class SequentiallyF[F[_], K] private (
+final class SequentiallyF[F[_] : Async, K] private (
   semaphores: Vector[Semaphore[F]]
-)(implicit
-  F: Async[F]
 ) {
 
   private val bucketCount = semaphores.size
@@ -45,7 +43,7 @@ final class SequentiallyF[F[_], K] private (
     dispatcher: Dispatcher[F]
   ): Future[T] = {
     val semaphore = semaphores(getBucket(key))
-    val run: F[T] = semaphore.permit.use(_ => F.delay(task))
+    val run: F[T] = semaphore.permit.use(_ => Async[F].delay(task))
     dispatcher.unsafeToFuture(run)
   }
 

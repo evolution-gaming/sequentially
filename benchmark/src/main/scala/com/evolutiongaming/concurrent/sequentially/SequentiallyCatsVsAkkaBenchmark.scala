@@ -50,6 +50,7 @@ class SequentiallyCatsVsAkkaBenchmark extends Common {
     implicit val ec: scala.concurrent.ExecutionContext = akkaSystem.dispatcher
     val futures = List.fill(BatchSize)(akkaSequentially(Random.nextInt()) {})
     Await.result(Future.sequence(futures), 10.seconds)
+    ()
   }
 
   @Benchmark
@@ -58,6 +59,7 @@ class SequentiallyCatsVsAkkaBenchmark extends Common {
       catsSequentially.applyF(Random.nextInt())(IO.unit)
     )
     operations.sequence.unsafeRunSync()(runtime)
+    ()
   }
 
   @Benchmark
@@ -65,6 +67,7 @@ class SequentiallyCatsVsAkkaBenchmark extends Common {
     implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
     val futures = List.fill(BatchSize)(catsSequentially(Random.nextInt()) {}(dispatcher))
     Await.result(Future.sequence(futures), 10.seconds)
+    ()
   }
 
   @TearDown(Level.Trial)

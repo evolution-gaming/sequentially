@@ -21,8 +21,12 @@ class SequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutures with
     interval = Span(50, Millis),
   )
 
-  implicit val dispatcher: Dispatcher[IO] =
-    Dispatcher.parallel[IO].allocated.unsafeRunSync()(IORuntime.global)._1
+  implicit val dispatcher: Dispatcher[IO] = createDispatcher
+
+  private def createDispatcher: Dispatcher[IO] = {
+    val (dispatcher, _) = Dispatcher.parallel[IO].allocated.unsafeRunSync()(IORuntime.global)
+    dispatcher
+  }
 
   "SequentiallyF" should {
 
@@ -170,7 +174,7 @@ class SequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutures with
       val semaphores = List.fill(bucketCount)(Semaphore[IO](1)).sequence.map(_.toVector).unsafeRunSync()
       implicit val (dispatcher: Dispatcher[IO], dispatcherCleanup: IO[Unit]) =
         Dispatcher.parallel[IO].allocated.unsafeRunSync()
-      val sequentially = SequentiallyF.resource[IO, Int](semaphores).allocated.unsafeRunSync()._1
+      val (sequentially, _) = SequentiallyF.resource[IO, Int](semaphores).allocated.unsafeRunSync()
 
       try {
         // Verify all semaphores are initialized
