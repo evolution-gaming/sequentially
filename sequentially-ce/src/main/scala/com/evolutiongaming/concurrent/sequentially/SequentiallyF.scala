@@ -67,20 +67,15 @@ object SequentiallyF {
   /** Create a SequentiallyF instance with custom semaphores and dispatcher.
     * Useful for testing.
     */
-  def resource[F[_], K](
+  def resource[F[_] : Async, K](
     semaphores: Vector[Semaphore[F]]
-  )(implicit
-    F: Async[F]
   ): Resource[F, SequentiallyF[F, K]] =
     Resource.pure(new SequentiallyF[F, K](semaphores))
 
   /** Create a SequentiallyF instance with default configuration.
     * Bucket count = (availableProcessors max 1) * 5
     */
-  def resource[F[_], K](
-    implicit
-    F: Async[F]
-  ): Resource[F, SequentiallyF[F, K]] = {
+  def resource[F[_] : Async, K](): Resource[F, SequentiallyF[F, K]] = {
     val bucketCount = (Runtime.getRuntime.availableProcessors() max 1) * 5
 
     for {

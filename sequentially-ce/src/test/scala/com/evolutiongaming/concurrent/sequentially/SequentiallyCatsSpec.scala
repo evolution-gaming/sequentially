@@ -31,7 +31,7 @@ class SequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutures with
   "SequentiallyF" should {
 
     "execute tasks in parallel for different keys without Thread.sleep" in {
-      val (sequentially, cleanup) = SequentiallyF.resource[IO, Int].allocated.unsafeRunSync()
+      val (sequentially, cleanup) = SequentiallyF.resource[IO, Int]().allocated.unsafeRunSync()
 
       try {
         val startBarrier = new CyclicBarrier(3)
@@ -84,7 +84,7 @@ class SequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutures with
     }
 
     "execute tasks sequentially for the same key" in {
-      val (sequentially, cleanup) = SequentiallyF.resource[IO, Int].allocated.unsafeRunSync()
+      val (sequentially, cleanup) = SequentiallyF.resource[IO, Int]().allocated.unsafeRunSync()
 
       try {
         val executionOrder = new AtomicInteger(0)
@@ -127,7 +127,7 @@ class SequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutures with
     }
 
     "handle exceptions without breaking sequential execution" in {
-      val (sequentially, cleanup) = SequentiallyF.resource[IO, Int].allocated.unsafeRunSync()
+      val (sequentially, cleanup) = SequentiallyF.resource[IO, Int]().allocated.unsafeRunSync()
 
       try {
         val executionOrder = new AtomicInteger(0)
@@ -217,7 +217,7 @@ class SequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutures with
     }
 
     "execute F-based tasks correctly with applyF" in {
-      val (seq, cleanup) = SequentiallyF.resource[IO, Int].allocated.unsafeRunSync()
+      val (seq, cleanup) = SequentiallyF.resource[IO, Int]().allocated.unsafeRunSync()
       val sequentially = seq.asInstanceOf[SequentiallyF[IO, Int]]
 
       try {
@@ -253,7 +253,7 @@ class SequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutures with
     }
 
     "handle F[_] exceptions in applyF without breaking sequential execution" in {
-      val (seq, cleanup) = SequentiallyF.resource[IO, Int].allocated.unsafeRunSync()
+      val (seq, cleanup) = SequentiallyF.resource[IO, Int]().allocated.unsafeRunSync()
       val sequentially = seq.asInstanceOf[SequentiallyF[IO, Int]]
 
       try {
@@ -311,7 +311,7 @@ class SequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutures with
     }
 
     "handle F[_] exceptions in parallel for different keys" in {
-      val (seq, cleanup) = SequentiallyF.resource[IO, Int].allocated.unsafeRunSync()
+      val (seq, cleanup) = SequentiallyF.resource[IO, Int]().allocated.unsafeRunSync()
       val sequentially = seq.asInstanceOf[SequentiallyF[IO, Int]]
 
       try {
@@ -358,7 +358,7 @@ class SequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutures with
     }
 
     "maintain correctness under concurrent stress" in {
-      val (sequentially, cleanup) = SequentiallyF.resource[IO, Int].allocated.unsafeRunSync()
+      val (sequentially, cleanup) = SequentiallyF.resource[IO, Int]().allocated.unsafeRunSync()
 
       try {
         val numKeys = 50
