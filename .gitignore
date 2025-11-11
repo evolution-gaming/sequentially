@@ -24,3 +24,4 @@ project/plugins/project/
 
 # Mac
 .DS_Store
+/benchmark-results/*
