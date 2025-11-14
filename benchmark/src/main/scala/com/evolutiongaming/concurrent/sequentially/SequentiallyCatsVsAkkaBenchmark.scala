@@ -40,7 +40,7 @@ class SequentiallyCatsVsAkkaBenchmark extends Common {
     dispatcher = disp
     dispatcherCleanup = dispClean
 
-    val (seq, clean) = SequentiallyF.resource[IO, Int].allocated.unsafeRunSync()(runtime)
+    val (seq, clean) = SequentiallyF.resource[IO, Int]().allocated.unsafeRunSync()(runtime)
     catsSequentially = seq
     catsCleanup = clean
   }

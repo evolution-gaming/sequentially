@@ -14,11 +14,10 @@ import scala.concurrent.Future
   * - Number of buckets: (availableProcessors max 1) * 5
   * - All semaphores are pre-allocated at initialization
   */
-final class SequentiallyF[F[_] : Async, K] private (
-  semaphores: Vector[Semaphore[F]]
+final class SequentiallyF[F[_] : Async, -K] private (
+  semaphores: Array[Semaphore[F]]
 ) {
-
-  private val bucketCount = semaphores.size
+  private val bucketCount = semaphores.length
 
   /** Map key to bucket index using hash */
   private def getBucket(key: K): Int = {
@@ -35,8 +34,8 @@ final class SequentiallyF[F[_] : Async, K] private (
     * @param task the by-name task to execute
     * @return Future[T] result
     */
-  def apply[KK <: K, T](
-    key: KK
+  def apply[T](
+    key: K
   )(
     task: => T
   )(implicit
@@ -57,7 +56,7 @@ final class SequentiallyF[F[_] : Async, K] private (
     * @param task the effectful task to execute
     * @return F[T] result without Future conversion
     */
-  def applyF[KK <: K, T](key: KK)(task: => F[T]): F[T] = {
+  def applyF[T](key: K)(task: => F[T]): F[T] = {
     semaphores(getBucket(key)).permit.use(_ => task)
   }
 }
@@ -68,7 +67,7 @@ object SequentiallyF {
     * Useful for testing.
     */
   def resource[F[_] : Async, K](
-    semaphores: Vector[Semaphore[F]]
+    semaphores: Array[Semaphore[F]]
   ): Resource[F, SequentiallyF[F, K]] =
     Resource.pure(new SequentiallyF[F, K](semaphores))
 
@@ -81,7 +80,7 @@ object SequentiallyF {
     for {
       // Pre-allocate all semaphores
       semaphores <- Resource.eval(
-        List.fill(bucketCount)(Semaphore[F](1)).sequence.map(_.toVector)
+        List.fill(bucketCount)(Semaphore[F](1)).sequence.map(_.toArray)
       )
     } yield new SequentiallyF[F, K](semaphores)
   }

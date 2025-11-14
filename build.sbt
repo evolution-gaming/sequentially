@@ -97,6 +97,26 @@ lazy val `sequentially-ce` = projectMatrix
   )
   .jvmPlatform(scalaVersions = scalaVersions)
 
+lazy val `sequentially-ce-metrics` = projectMatrix
+  .in(file("sequentially-ce-metrics"))
+  .settings(commonSettings)
+  .settings(
+    name := "sequentially-ce-metrics"
+  )
+  .settings(
+    libraryDependencies ++= Seq(
+      PrometheusTools,
+      Dependencies.CatsEffect.effect,
+      Scalatest % Test,
+    ),
+    excludeDependencies ++= Seq(
+      ExclusionRule("com.typesafe.akka"),
+      ExclusionRule("org.apache.pekko"),
+    ),
+  )
+  .jvmPlatform(scalaVersions = scalaVersions)
+  .dependsOn(`sequentially-ce`)
+
 lazy val benchmark = project
   .in(file("benchmark"))
   .settings(commonSettings)
