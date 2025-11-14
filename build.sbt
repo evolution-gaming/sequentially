@@ -145,7 +145,6 @@ lazy val `sequentially-metrics` = projectMatrix
   )
   .configureMatrix(asAkkaPekkoModule())
 
-
 //used by evolution-gaming/scala-github-actions
 addCommandAlias(
   "check",
