@@ -171,7 +171,7 @@ class SequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutures with
       val bucketCount = (Runtime.getRuntime.availableProcessors() max 1) * 5
 
       // Create semaphores and dispatcher that we can inspect
-      val semaphores = List.fill(bucketCount)(Semaphore[IO](1)).sequence.map(_.toVector).unsafeRunSync()
+      val semaphores = List.fill(bucketCount)(Semaphore[IO](1)).sequence.map(_.toArray).unsafeRunSync()
       implicit val (dispatcher: Dispatcher[IO], dispatcherCleanup: IO[Unit]) =
         Dispatcher.parallel[IO].allocated.unsafeRunSync()
       val (sequentially, _) = SequentiallyF.resource[IO, Int](semaphores).allocated.unsafeRunSync()
