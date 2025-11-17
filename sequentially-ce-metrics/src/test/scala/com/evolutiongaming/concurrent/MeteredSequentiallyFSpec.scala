@@ -70,8 +70,10 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
 
         val results = (task1, task2).tupled.unsafeRunSync()
 
-        results._1 shouldEqual "key1-result"
-        results._2 shouldEqual "key2-result"
+        val (key1, key2) = results
+        key1 shouldEqual "key1-result"
+        key2 shouldEqual "key2-result"
+
         key1Counter.get() shouldEqual 1
         key2Counter.get() shouldEqual 1
 
@@ -100,8 +102,6 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
           Array("test-metrics", "run")
         )
 
-        queueCount should not be null
-        runCount should not be null
         queueCount.doubleValue() should be >= 0.0
         runCount.doubleValue() should be >= 0.0
 
@@ -161,8 +161,6 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
           Array("test-apply-metrics", "run")
         )
 
-        queueCount should not be null
-        runCount should not be null
         queueCount.doubleValue() should be >= 0.0
         runCount.doubleValue() should be >= 0.0
 
@@ -265,8 +263,6 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
           Array("name2", "run")
         )
 
-        count1 should not be null
-        count2 should not be null
         count1.doubleValue() should be >= 0.0
         count2.doubleValue() should be >= 0.0
 
@@ -323,7 +319,6 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
 
       try {
         val metered = factory("test-factory")
-        metered should not be null
         
         val result = metered.applyF(1)(IO.pure("result")).unsafeRunSync()
         result shouldEqual "result"
@@ -379,7 +374,6 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
           Array("factory-test", "run")
         )
 
-        count should not be null
         count.doubleValue() should be >= 0.0
 
       } finally {

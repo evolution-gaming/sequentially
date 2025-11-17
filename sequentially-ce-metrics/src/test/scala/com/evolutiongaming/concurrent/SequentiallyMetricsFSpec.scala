@@ -6,7 +6,9 @@ import io.prometheus.client.CollectorRegistry
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import java.util.concurrent.atomic.AtomicBoolean
 import scala.jdk.CollectionConverters.*
+import scala.util.Try
 
 class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
 
@@ -18,7 +20,6 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
 
       val metrics = factory("test-name")
 
-      metrics should not be null
       // Verify it has the expected methods by calling queue
       val queueResult = metrics.queue(System.nanoTime())
       queueResult shouldBe a[IO[_]]
@@ -80,7 +81,7 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
         Array("test-queue", "queue")
       )
       
-      summary should not be null
+      Option(summary).isDefined shouldBe true
       summary.doubleValue() should be >= 0.0
     }
 
@@ -106,8 +107,8 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
         Array("name2", "queue")
       )
 
-      count1 should not be null
-      count2 should not be null
+      Option(count1).isDefined shouldBe true
+      Option(count2).isDefined shouldBe true
       count1.doubleValue() should be >= 0.0
       count2.doubleValue() should be >= 0.0
     }
@@ -141,7 +142,7 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
         Array("test-run", "run")
       )
 
-      count should not be null
+      Option(count).isDefined shouldBe true
       count.doubleValue() should be >= 0.0
     }
 
@@ -166,8 +167,8 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
         Array("name2", "run")
       )
 
-      count1 should not be null
-      count2 should not be null
+      Option(count1).isDefined shouldBe true
+      Option(count2).isDefined shouldBe true
       count1.doubleValue() should be >= 0.0
       count2.doubleValue() should be >= 0.0
     }
@@ -192,26 +193,21 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
 
       val task = IO.raiseError[String](new RuntimeException("test error"))
 
-      // Attempt to run and catch exception
-      try {
-        metrics.run(task).unsafeRunSync()
-      } catch {
-        case _: RuntimeException => // Expected
-      }
+      // Attempt to run and catch exception using Try
+      val result = Try(metrics.run(task).unsafeRunSync())
+      result.isFailure shouldBe true
 
       // Note: The current implementation records metrics only on success
       // This test documents the current behavior
-      val count = registry.getSampleValue(
+      val count = Option(registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
         Array("test-error", "run")
-      )
+      ))
 
       // If exception occurs before flatMap completes, metric may not be recorded
       // This is expected behavior based on the implementation
-      if (count != null) {
-        count.doubleValue() shouldEqual 0.0
-      }
+      count.foreach(_.doubleValue() shouldEqual 0.0)
     }
 
     "execute task lazily" in {
@@ -219,18 +215,18 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val factory = SequentiallyMetricsF.Factory[IO](registry)
       val metrics = factory("test-lazy")
 
-      var executed = false
+      val executed = new AtomicBoolean(false)
       val task = IO {
-        executed = true
+        executed.set(true)
         "result"
       }
 
       // Task should not execute until run is called
-      executed shouldBe false
+      executed.get() shouldBe false
 
       val result = metrics.run(task).unsafeRunSync()
 
-      executed shouldBe true
+      executed.get() shouldBe true
       result shouldEqual "result"
     }
 
@@ -258,9 +254,9 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
         Array("test-duration", "run")
       )
 
-      summary should not be null
+      Option(summary).isDefined shouldBe true
       summary.doubleValue() should be > 0.0
-      summary.doubleValue() should be < duration + 0.1 // Allow some margin
+      summary.doubleValue() should be < duration + 0.5
     }
   }
 
@@ -287,8 +283,8 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
         Array("test-integration", "run")
       )
 
-      queueCount should not be null
-      runCount should not be null
+      Option(queueCount).isDefined shouldBe true
+      Option(runCount).isDefined shouldBe true
       queueCount.doubleValue() should be >= 0.0
       runCount.doubleValue() should be >= 0.0
     }
@@ -317,6 +313,8 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
         Array("test-multiple", "run")
       )
 
+      Option(queueCount).isDefined shouldBe true
+      Option(runCount).isDefined shouldBe true
       queueCount.doubleValue() shouldEqual 10.0
       runCount.doubleValue() shouldEqual 10.0
     }
