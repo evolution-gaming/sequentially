@@ -42,6 +42,7 @@ lazy val root = project
   .aggregate(
     (sequentially.projectRefs ++
       `sequentially-ce`.projectRefs ++
+      `sequentially-ce-metrics`.projectRefs ++
       `sequentially-metrics`.projectRefs :+
       projectToRef(benchmark)): _*
   )

@@ -10,7 +10,7 @@ import scala.concurrent.Future
 /** Wrapper around SequentiallyF that adds metrics tracking.
   * Since SequentiallyF is a final class, we wrap it by delegation.
   */
-final class MeteredSequentiallyF[F[_]: Async, -K] private (
+final class MeteredSequentiallyF[F[_] : Async, -K] private (
   private val sequentially: SequentiallyF[F, K],
   private val metrics: SequentiallyMetricsF[F],
 ) {
@@ -27,14 +27,14 @@ final class MeteredSequentiallyF[F[_]: Async, -K] private (
 
   def applyF[T](key: K)(task: => F[T]): F[T] = {
     val start = System.nanoTime()
-    
+
     metrics.queue(start) *> metrics.run(sequentially.applyF(key)(task))
   }
 }
 
 object MeteredSequentiallyF {
 
-  def apply[F[_]: Async, K](
+  def apply[F[_] : Async, K](
     sequentially: SequentiallyF[F, K],
     name: String,
     sequentiallyMetrics: SequentiallyMetricsF.Factory[F],
@@ -42,7 +42,7 @@ object MeteredSequentiallyF {
     apply(sequentially, sequentiallyMetrics(name))
   }
 
-  def apply[F[_]: Async, K](
+  def apply[F[_] : Async, K](
     sequentially: SequentiallyF[F, K],
     metrics: SequentiallyMetricsF[F],
   ): MeteredSequentiallyF[F, K] = {
@@ -59,7 +59,7 @@ object MeteredSequentiallyF {
       def apply[K]: SequentiallyF[F, K]
     }
 
-    def apply[F[_]: Async](
+    def apply[F[_] : Async](
       provider: Provider[F],
       sequentiallyMetrics: SequentiallyMetricsF.Factory[F],
     ): Factory[F] = new Factory[F] {
