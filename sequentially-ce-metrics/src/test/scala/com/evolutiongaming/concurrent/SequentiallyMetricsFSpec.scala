@@ -40,7 +40,7 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val factory = SequentiallyMetricsF.Factory[IO](registry, prefix = "custom_prefix")
 
       factory("test-name")
-      
+
       // Verify metric exists with custom prefix
       val metricName = "custom_prefix_time"
       val samples = registry.metricFamilySamples().asIterator().asScala.toSeq
@@ -53,7 +53,7 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val factory = SequentiallyMetricsF.Factory[IO](registry)
 
       factory("test-name")
-      
+
       // Verify metric exists with default prefix
       val metricName = "sequentially_time"
       val samples = registry.metricFamilySamples().asIterator().asScala.toSeq
@@ -70,7 +70,7 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val metrics = factory("test-queue")
 
       val startNanos = System.nanoTime()
-      
+
       // Record queue time
       metrics.queue(startNanos).unsafeRunSync()
 
@@ -78,9 +78,9 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val summary = registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
-        Array("test-queue", "queue")
+        Array("test-queue", "queue"),
       )
-      
+
       Option(summary).isDefined shouldBe true
       summary.doubleValue() should be >= 0.0
     }
@@ -99,12 +99,12 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val count1 = registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
-        Array("name1", "queue")
+        Array("name1", "queue"),
       )
       val count2 = registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
-        Array("name2", "queue")
+        Array("name2", "queue"),
       )
 
       Option(count1).isDefined shouldBe true
@@ -139,7 +139,7 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val count = registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
-        Array("test-run", "run")
+        Array("test-run", "run"),
       )
 
       Option(count).isDefined shouldBe true
@@ -159,12 +159,12 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val count1 = registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
-        Array("name1", "run")
+        Array("name1", "run"),
       )
       val count2 = registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
-        Array("name2", "run")
+        Array("name2", "run"),
       )
 
       Option(count1).isDefined shouldBe true
@@ -202,7 +202,7 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val count = Option(registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
-        Array("test-error", "run")
+        Array("test-error", "run"),
       ))
 
       // If exception occurs before flatMap completes, metric may not be recorded
@@ -251,7 +251,7 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val summary = registry.getSampleValue(
         "sequentially_time_sum",
         Array("name", "operation"),
-        Array("test-duration", "run")
+        Array("test-duration", "run"),
       )
 
       Option(summary).isDefined shouldBe true
@@ -275,12 +275,12 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val queueCount = registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
-        Array("test-integration", "queue")
+        Array("test-integration", "queue"),
       )
       val runCount = registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
-        Array("test-integration", "run")
+        Array("test-integration", "run"),
       )
 
       Option(queueCount).isDefined shouldBe true
@@ -305,12 +305,12 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
       val queueCount = registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
-        Array("test-multiple", "queue")
+        Array("test-multiple", "queue"),
       )
       val runCount = registry.getSampleValue(
         "sequentially_time_count",
         Array("name", "operation"),
-        Array("test-multiple", "run")
+        Array("test-multiple", "run"),
       )
 
       Option(queueCount).isDefined shouldBe true
@@ -320,4 +320,3 @@ class SequentiallyMetricsFSpec extends AnyWordSpec with Matchers {
     }
   }
 }
-

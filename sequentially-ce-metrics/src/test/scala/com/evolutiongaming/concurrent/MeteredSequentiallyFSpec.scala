@@ -94,12 +94,12 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
         val queueCount = registry.getSampleValue(
           "sequentially_time_count",
           Array("name", "operation"),
-          Array("test-metrics", "queue")
+          Array("test-metrics", "queue"),
         )
         val runCount = registry.getSampleValue(
           "sequentially_time_count",
           Array("name", "operation"),
-          Array("test-metrics", "run")
+          Array("test-metrics", "run"),
         )
 
         queueCount.doubleValue() should be >= 0.0
@@ -116,7 +116,7 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
       val (dispatcher, dispatcherCleanup) = Dispatcher.parallel[IO].allocated.unsafeRunSync()
       val metricsFactory = SequentiallyMetricsF.Factory[IO](registry)
       val metered = MeteredSequentiallyF(sequentially, "test-apply", metricsFactory)
-      
+
       implicit val disp: Dispatcher[IO] = dispatcher
 
       try {
@@ -153,12 +153,12 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
         val queueCount = registry.getSampleValue(
           "sequentially_time_count",
           Array("name", "operation"),
-          Array("test-apply-metrics", "queue")
+          Array("test-apply-metrics", "queue"),
         )
         val runCount = registry.getSampleValue(
           "sequentially_time_count",
           Array("name", "operation"),
-          Array("test-apply-metrics", "run")
+          Array("test-apply-metrics", "run"),
         )
 
         queueCount.doubleValue() should be >= 0.0
@@ -225,12 +225,12 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
         val queueCount = registry.getSampleValue(
           "sequentially_time_count",
           Array("name", "operation"),
-          Array("test-multiple", "queue")
+          Array("test-multiple", "queue"),
         )
         val runCount = registry.getSampleValue(
           "sequentially_time_count",
           Array("name", "operation"),
-          Array("test-multiple", "run")
+          Array("test-multiple", "run"),
         )
 
         queueCount.doubleValue() shouldEqual 10.0
@@ -255,12 +255,12 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
         val count1 = registry.getSampleValue(
           "sequentially_time_count",
           Array("name", "operation"),
-          Array("name1", "run")
+          Array("name1", "run"),
         )
         val count2 = registry.getSampleValue(
           "sequentially_time_count",
           Array("name", "operation"),
-          Array("name2", "run")
+          Array("name2", "run"),
         )
 
         count1.doubleValue() should be >= 0.0
@@ -310,16 +310,16 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
       val registry = new CollectorRegistry()
       val (sequentially, cleanup) = SequentiallyF.resource[IO, Int]().allocated.unsafeRunSync()
       val metricsFactory = SequentiallyMetricsF.Factory[IO](registry)
-      
+
       val provider = new MeteredSequentiallyF.Factory.Provider[IO] {
         override def apply[K]: SequentiallyF[IO, K] = sequentially.asInstanceOf[SequentiallyF[IO, K]]
       }
-      
+
       val factory = MeteredSequentiallyF.Factory(provider, metricsFactory)
 
       try {
         val metered = factory("test-factory")
-        
+
         val result = metered.applyF(1)(IO.pure("result")).unsafeRunSync()
         result shouldEqual "result"
 
@@ -332,11 +332,11 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
       val registry = new CollectorRegistry()
       val (sequentially, cleanup) = SequentiallyF.resource[IO, Int]().allocated.unsafeRunSync()
       val metricsFactory = SequentiallyMetricsF.Factory[IO](registry)
-      
+
       val provider = new MeteredSequentiallyF.Factory.Provider[IO] {
         override def apply[K]: SequentiallyF[IO, K] = sequentially.asInstanceOf[SequentiallyF[IO, K]]
       }
-      
+
       val factory = MeteredSequentiallyF.Factory(provider, metricsFactory)
 
       try {
@@ -357,11 +357,11 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
       val registry = new CollectorRegistry()
       val (sequentially, cleanup) = SequentiallyF.resource[IO, Int]().allocated.unsafeRunSync()
       val metricsFactory = SequentiallyMetricsF.Factory[IO](registry)
-      
+
       val provider = new MeteredSequentiallyF.Factory.Provider[IO] {
         override def apply[K]: SequentiallyF[IO, K] = sequentially.asInstanceOf[SequentiallyF[IO, K]]
       }
-      
+
       val factory = MeteredSequentiallyF.Factory(provider, metricsFactory)
 
       try {
@@ -371,7 +371,7 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
         val count = registry.getSampleValue(
           "sequentially_time_count",
           Array("name", "operation"),
-          Array("factory-test", "run")
+          Array("factory-test", "run"),
         )
 
         count.doubleValue() should be >= 0.0
@@ -382,4 +382,3 @@ class MeteredSequentiallyFSpec extends AnyWordSpec with Matchers with ScalaFutur
     }
   }
 }
-

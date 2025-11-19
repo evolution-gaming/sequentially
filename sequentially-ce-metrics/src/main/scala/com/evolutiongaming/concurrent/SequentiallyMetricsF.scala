@@ -19,7 +19,7 @@ object SequentiallyMetricsF {
     /** @note Must be singleton as metric names must be unique.
       * @see CollectorRegistry#register
       */
-    def apply[F[_]: Sync](
+    def apply[F[_] : Sync](
       prometheusRegistry: CollectorRegistry,
       prefix: String = "sequentially",
     ): Factory[F] = {
@@ -54,4 +54,3 @@ object SequentiallyMetricsF {
     }
   }
 }
-
