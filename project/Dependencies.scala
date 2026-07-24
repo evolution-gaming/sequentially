@@ -4,7 +4,7 @@ object Dependencies {
 
   val PrometheusTools = "com.evolutiongaming" %% "prometheus-tools" % "1.1.0"
   val FutureHelper = "com.evolutiongaming" %% "future-helper" % "1.0.7"
-  val Scalatest = "org.scalatest" %% "scalatest" % "3.2.19"
+  val Scalatest = "org.scalatest" %% "scalatest" % "3.2.20"
 
   object Akka {
     private val Version = "2.6.21" // last OSS Akka version
