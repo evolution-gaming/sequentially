@@ -5,9 +5,12 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   release:
-    uses: evolution-gaming/scala-github-actions/.github/workflows/release.yml@v4
+    uses: evolution-gaming/scala-github-actions/.github/workflows/release.yml@f02d2d572f3070fba1fd22edfb02070e57a0651b # v7.0.0
     secrets: inherit
     with:
       verify_sbt_command: 'clean; check; all test package'
