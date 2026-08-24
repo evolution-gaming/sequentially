@@ -28,6 +28,12 @@ lazy val commonSettings = Seq(
   publishTo := Some(Resolver.evolutionReleases),
   versionScheme := Some("semver-spec"),
   versionPolicyIntention := Compatibility.BinaryCompatible,
+  versionPolicyIgnored ++= Seq(
+    // add libraries here that are known to be binary compatible, like:
+    // transitive dependency of pekko-stream (TLS support), not used by this project
+    // and not part of its API; 0.6.1 -> 0.7.1 is only breaking under PVP
+    "com.typesafe" %% "ssl-config-core"
+  ),
 )
 
 lazy val root = project
@@ -147,12 +153,9 @@ lazy val `sequentially-metrics` = projectMatrix
   .configureMatrix(asAkkaPekkoModule())
 
 //used by evolution-gaming/scala-github-actions
-addCommandAlias(
-  "check",
-  "all versionPolicyCheck Compile/doc scalafmtCheckAll scalafmtSbtCheck; scalafixEnable; scalafixAll --check",
-)
+addCommandAlias("check", "all versionPolicyCheck Compile/doc scalafmtCheckRepo")
 
-addCommandAlias("fmtAll", "all scalafmtAll scalafmtSbt; scalafixEnable; scalafixAll")
+addCommandAlias("fmt", "scalafmtRepo")
 
 def asAkkaPekkoModule(
   akkaDependencies: Seq[ModuleID] = Seq.empty,
