@@ -1,18 +1,17 @@
 import Dependencies.*
 import ProjectMatrixSyntax.*
 import sbt.Keys.*
-import sbt.Project.projectToRef
-import sbt.internal.ProjectMatrix
+import sbt.ProjectMatrix
 
 lazy val scalaVersions = Seq("2.13.18", "3.3.8")
 
 lazy val commonSettings = Seq(
   organization := "com.evolutiongaming",
-  homepage := Some(url("https://github.com/evolution-gaming/sequentially")),
+  homepage := Some(uri("https://github.com/evolution-gaming/sequentially")),
   startYear := Some(2018),
   organizationName := "Evolution",
-  organizationHomepage := Some(url("https://evolution.com")),
-  licenses := Seq(("MIT", url("https://opensource.org/licenses/MIT"))),
+  organizationHomepage := Some(uri("https://evolution.com")),
+  licenses := Seq(("MIT", uri("https://opensource.org/licenses/MIT"))),
 
   // compiler settings
   Compile / scalacOptions ++= {
@@ -50,7 +49,7 @@ lazy val root = project
       `sequentially-ce`.projectRefs ++
       `sequentially-ce-metrics`.projectRefs ++
       `sequentially-metrics`.projectRefs :+
-      projectToRef(benchmark)): _*
+      projectToLocalProject(benchmark)) *
   )
 
 lazy val sequentially = projectMatrix
@@ -154,8 +153,8 @@ lazy val `sequentially-metrics` = projectMatrix
 
 //used by evolution-gaming/scala-github-actions
 addCommandAlias("check", "all versionPolicyCheck Compile/doc scalafmtCheckRepo")
-
 addCommandAlias("fmt", "scalafmtRepo")
+addCommandAlias("build", "all compile testFull")
 
 def asAkkaPekkoModule(
   akkaDependencies: Seq[ModuleID] = Seq.empty,
