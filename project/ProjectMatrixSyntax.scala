@@ -1,4 +1,4 @@
-import sbt.internal.ProjectMatrix
+import sbt.ProjectMatrix
 
 /** Provides missing syntax for [[ProjectMatrix]] */
 object ProjectMatrixSyntax {
