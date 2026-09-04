@@ -3,7 +3,7 @@ import ProjectMatrixSyntax.*
 import sbt.Keys.*
 import sbt.ProjectMatrix
 
-lazy val scalaVersions = Seq("2.13.18", "3.3.8")
+lazy val scalaVersions = Seq("3.9.0", "3.3.8")
 
 lazy val commonSettings = Seq(
   organization := "com.evolutiongaming",
