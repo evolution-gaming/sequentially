@@ -10,4 +10,4 @@ addSbtPlugin("ch.epfl.scala" % "sbt-version-policy" % "3.4.0")
 
 addSbtPlugin("com.github.sbt" % "sbt-dynver" % "5.1.1")
 
-addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.8")
+addSbtPlugin("com.github.sbt" % "sbt-jmh" % "0.4.9")
